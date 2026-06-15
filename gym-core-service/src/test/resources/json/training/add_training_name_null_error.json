@@ -1,0 +1,4 @@
+{
+  "errorCode": 2760,
+  "errorMessage": "Validation error: trainingName: must not be null"
+}

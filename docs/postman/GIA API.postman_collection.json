@@ -1,0 +1,610 @@
+{
+  "info": {
+    "_postman_id": "7bad9a39-186b-4d07-98a4-16f860bf49ce",
+    "name": "GIA API",
+    "description": "```\nAPI for managing trainees, their profiles, trainers, and training schedules\n\n ```",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "38188347"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login as Trainee",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/auth/login",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Trainer",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"{{trainerUsername}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/auth/login",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"oldPassword\": \"{{oldPassword}}\",\r\n    \"newPassword\": \"{{newPassword}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/auth/password",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "auth",
+                "password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/auth/logout",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Trainees",
+      "item": [
+        {
+          "name": "Register Trainee",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"{{newTraineeFirstName}}\",\r\n    \"lastName\": \"{{newTraineeLastName}}\",\r\n    \"dateOfBirth\": \"{{newTraineeDateOfBirth}}\",\r\n    \"address\": \"{{newTraineeAddress}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/register",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trainee profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/{{traineeUsername}}",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "{{traineeUsername}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Trainee's available Trainers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/{{traineeUsername}}/available-trainers",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "{{traineeUsername}}",
+                "available-trainers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trainee's Trainings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/{{traineeUsername}}/trainings?fromDate={{traineeTrainingFromDate}}&toDate={{traineeTrainingToDate}}&trainerName={{traineeTrainingTrainerName}}&trainingType={{traineeTrainingTrainingType}}",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "{{traineeUsername}}",
+                "trainings"
+              ],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "{{traineeTrainingFromDate}}",
+                  "description": "yyyy-MM-dd — for example, \"2000-10-31\""
+                },
+                {
+                  "key": "toDate",
+                  "value": "{{traineeTrainingToDate}}",
+                  "description": "yyyy-MM-dd — for example, \"2000-10-31\""
+                },
+                {
+                  "key": "trainerName",
+                  "value": "{{traineeTrainingTrainerName}}",
+                  "description": "Trainer name"
+                },
+                {
+                  "key": "trainingType",
+                  "value": "{{traineeTrainingTrainingType}}",
+                  "description": "Training type name"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Trainee Profile",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"{{updatedTraineeFirstName}}\",\r\n    \"lastName\": \"{{updatedTraineeLastName}}\",\r\n    \"dateOfBirth\": \"{{updatedTraineeDateOfBirth}}\",\r\n    \"address\": \"{{updatedTraineeAddress}}\",\r\n    \"isActive\": {{updatedTraineeActiveStatus}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/{{traineeUsername}}",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "{{traineeUsername}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Trainee's Trainers list",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"trainerUsernames\": {{trainerUsernames}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/{{traineeUsername}}/trainers",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "{{traineeUsername}}",
+                "trainers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Trainee's activation status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"isActive\": {{updatedTraineeActiveStatus}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/{{traineeUsername}}/activation",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "{{traineeUsername}}",
+                "activation"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Trainee profile",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainees/{{traineeUsername}}",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainees",
+                "{{traineeUsername}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trainers",
+      "item": [
+        {
+          "name": "Register Trainer",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"{{newTrainerFirstName}}\",\r\n    \"lastName\": \"{{newTrainerLastName}}\",\r\n    \"specialization\": \"{{newTrainerSpecialization}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainers/register",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainers",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trainer profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainers/{{trainerUsername}}",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainers",
+                "{{trainerUsername}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trainer's Trainings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainers/{{trainerUsername}}/trainings?fromDate={{trainerTrainingFromDate}}&toDate={{trainerTrainingToDate}}&traineeName={{trainerTrainingTraineeName}}",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainers",
+                "{{trainerUsername}}",
+                "trainings"
+              ],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "{{trainerTrainingFromDate}}",
+                  "description": "yyyy-MM-dd — for example, \"2000-10-31\""
+                },
+                {
+                  "key": "toDate",
+                  "value": "{{trainerTrainingToDate}}",
+                  "description": "yyyy-MM-dd — for example, \"2000-10-31\""
+                },
+                {
+                  "key": "traineeName",
+                  "value": "{{trainerTrainingTraineeName}}",
+                  "description": "Trainee name"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Trainer Profile",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"{{updatedTrainerFirstName}}\",\r\n    \"lastName\": \"{{updatedTrainerLastName}}\",\r\n    \"isActive\": {{updatedTrainerActiveStatus}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainers/{{trainerUsername}}",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainers",
+                "{{trainerUsername}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Trainer's activation status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"isActive\": {{updatedTrainerActiveStatus}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainers/{{trainerUsername}}/activation",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainers",
+                "{{trainerUsername}}",
+                "activation"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trainings",
+      "item": [
+        {
+          "name": "Add new training",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"trainingName\": \"{{newTrainingTrainingName}}\",\r\n    \"trainingDate\": \"{{newTrainingTrainingDate}}\",\r\n    \"trainingDuration\": {{newTrainingTrainingDuration}},\r\n    \"traineeUsername\": \"{{newTrainingTraineeUsername}}\",\r\n    \"trainerUsername\": \"{{newTrainingTrainerUsername}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainings",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all training types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{basePath}}/trainings/types",
+              "host": [
+                "{{baseUrl}}{{basePath}}"
+              ],
+              "path": [
+                "trainings",
+                "types"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

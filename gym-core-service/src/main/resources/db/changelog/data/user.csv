@@ -1,0 +1,7 @@
+first_name,last_name,username,password,is_active
+Liam,Miller,liam.miller,$2a$10$TBu5GORg5TJMXR7sulyWP.jTe8jrnm9QESKPp6c/IvoejT06MbcOO,true
+Sophia,Wilson,sophia.wilson,$2a$10$TBu5GORg5TJMXR7sulyWP.jTe8jrnm9QESKPp6c/IvoejT06MbcOO,true
+Bob,Wilson,bob.wilson,$2a$10$TBu5GORg5TJMXR7sulyWP.jTe8jrnm9QESKPp6c/IvoejT06MbcOO,false
+Marcus,Stone,marcus.stone,$2a$10$TBu5GORg5TJMXR7sulyWP.jTe8jrnm9QESKPp6c/IvoejT06MbcOO,true
+Sarah,Adams,sarah.adams,$2a$10$TBu5GORg5TJMXR7sulyWP.jTe8jrnm9QESKPp6c/IvoejT06MbcOO,true
+Alex,Morgan,alex.morgan,$2a$10$TBu5GORg5TJMXR7sulyWP.jTe8jrnm9QESKPp6c/IvoejT06MbcOO,true

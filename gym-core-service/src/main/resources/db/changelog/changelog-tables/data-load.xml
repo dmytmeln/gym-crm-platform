@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="GIA-87-load-initial-data" author="Dmytro Melnyk">
+        <loadData tableName="training_type"
+                  file="../data/training_type.csv"
+                  relativeToChangelogFile="true">
+            <column name="training_type_name" type="STRING"/>
+        </loadData>
+
+        <loadData tableName="user"
+                  file="../data/user.csv"
+                  relativeToChangelogFile="true">
+            <column name="first_name" type="STRING"/>
+            <column name="last_name" type="STRING"/>
+            <column name="username" type="STRING"/>
+            <column name="password" type="STRING"/>
+            <column name="is_active" type="BOOLEAN"/>
+        </loadData>
+
+        <loadData tableName="trainee"
+                  file="../data/trainee.csv"
+                  relativeToChangelogFile="true">
+            <column name="date_of_birth" type="LOCALDATE"/>
+            <column name="address" type="STRING"/>
+            <column name="user_id" type="BIGINT"/>
+        </loadData>
+
+        <loadData tableName="trainer"
+                  file="../data/trainer.csv"
+                  relativeToChangelogFile="true">>
+            <column name="user_id" type="BIGINT"/>
+            <column name="specialization_id" type="BIGINT"/>
+        </loadData>
+
+        <loadData tableName="trainee_trainer"
+                  file="../data/trainee_trainer.csv"
+                  relativeToChangelogFile="true">
+            <column name="trainee_id" type="BIGINT"/>
+            <column name="trainer_id" type="BIGINT"/>
+        </loadData>
+
+        <loadData tableName="training"
+                  file="../data/training.csv"
+                  relativeToChangelogFile="true">
+            <column name="training_name" type="STRING"/>
+            <column name="training_date" type="LOCALDATE"/>
+            <column name="training_duration" type="INT"/>
+            <column name="trainee_id" type="BIGINT"/>
+            <column name="trainer_id" type="BIGINT"/>
+            <column name="training_type_id" type="BIGINT"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>
