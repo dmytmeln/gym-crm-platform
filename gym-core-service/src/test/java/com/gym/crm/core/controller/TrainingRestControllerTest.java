@@ -20,6 +20,7 @@ import static com.gym.crm.core.exception.ApiError.NOT_FOUND_ERROR;
 import static com.gym.crm.core.exception.ApiError.SERVICE_ERROR;
 import static com.gym.crm.core.exception.ApiError.VALIDATION_ERROR;
 import static com.gym.crm.core.helper.JsonUtil.readJson;
+import static java.time.Month.JULY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -37,7 +38,7 @@ class TrainingRestControllerTest extends AbstractRestControllerTest {
     private static final String TRAINEE_USERNAME = "billy.herrington";
     private static final String TRAINER_USERNAME = "ricardo.milos";
     private static final String TRAINING_NAME = "Morning Cardio";
-    private static final LocalDate TRAINING_DATE = LocalDate.of(2025, 7, 20);
+    private static final LocalDate TRAINING_DATE = LocalDate.of(2025, JULY, 20);
     private static final Integer TRAINING_DURATION = 55;
 
     @Test

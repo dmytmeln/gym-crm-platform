@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.Month.APRIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -90,7 +91,7 @@ class TrainingServiceImplTest {
         Training training = Training.builder()
                 .trainer(buildTrainerWithUsername())
                 .trainingName("Test")
-                .trainingDate(LocalDate.of(2026, 4, 15))
+                .trainingDate(LocalDate.of(2026, APRIL, 15))
                 .trainingDuration(60)
                 .build();
 
@@ -105,7 +106,7 @@ class TrainingServiceImplTest {
         Training training = Training.builder()
                 .trainee(buildTraineeWithUsername())
                 .trainingName("Test")
-                .trainingDate(LocalDate.of(2026, 4, 15))
+                .trainingDate(LocalDate.of(2026, APRIL, 15))
                 .trainingDuration(60)
                 .build();
 
@@ -178,7 +179,7 @@ class TrainingServiceImplTest {
                 .trainee(buildTraineeWithUsername())
                 .trainer(buildTrainerWithUsername())
                 .trainingName("Morning Workout")
-                .trainingDate(LocalDate.of(2026, 4, 15))
+                .trainingDate(LocalDate.of(2026, APRIL, 15))
                 .trainingDuration(60)
                 .build();
     }

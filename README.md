@@ -1,8 +1,8 @@
 # Gym CRM
 
-![Build](https://github.com/dmytmeln/gym-crm/actions/workflows/ci.yml/badge.svg?branch=develop)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dmytmeln_gym-crm&metric=coverage)](https://sonarcloud.io/summary/overall?id=dmytmeln_gym-crm)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=dmytmeln_gym-crm&metric=alert_status)](https://sonarcloud.io/summary/overall?id=dmytmeln_gym-crm)
+![Build](https://github.com/dmytmeln/gym-crm-platform/actions/workflows/ci.yml/badge.svg?branch=develop)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dmytmeln_gym-crm-platform&metric=coverage)](https://sonarcloud.io/summary/overall?id=dmytmeln_gym-crm-platform)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=dmytmeln_gym-crm-platform&metric=alert_status)](https://sonarcloud.io/summary/overall?id=dmytmeln_gym-crm-platform)
 
 ## Prerequisites
 
@@ -18,8 +18,8 @@
 ### Step 1: Clone the Project
 
 ```bash
-git clone https://github.com/dmytmeln/gym-crm.git
-cd gym-crm
+git clone https://github.com/dmytmeln/gym-crm-platform.git
+cd gym-crm-platform
 ```
 
 ### Step 2: Set Up the Database

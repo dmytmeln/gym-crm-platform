@@ -8,6 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 
+import static java.time.Month.APRIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -17,7 +18,7 @@ class TrainingMapperTest {
     private static final String TRAINEE_USERNAME = "billy.herrington";
     private static final String TRAINER_USERNAME = "ricardo.milos";
     private static final String TRAINING_NAME = "Morning Workout";
-    private static final LocalDate TRAINING_DATE = LocalDate.of(2026, 4, 15);
+    private static final LocalDate TRAINING_DATE = LocalDate.of(2026, APRIL, 15);
     private static final Integer TRAINING_DURATION = 60;
 
     private TrainingMapper mapper;

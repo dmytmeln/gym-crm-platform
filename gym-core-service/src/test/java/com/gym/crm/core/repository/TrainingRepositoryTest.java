@@ -16,6 +16,8 @@ import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTraine
 import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTrainingConfigForExisting;
 import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTrainingConfigForSaved;
 import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTrainingTypeConfigForDirectFields;
+import static java.time.Month.FEBRUARY;
+import static java.time.Month.JANUARY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TrainingRepositoryTest extends AbstractRepositoryTest<TrainingRepository> {
@@ -33,7 +35,7 @@ class TrainingRepositoryTest extends AbstractRepositoryTest<TrainingRepository> 
         TrainingType validTrainingType = TrainingType.builder().id(2L).build();
         Training training = Training.builder()
                 .trainingName("Evening Yoga")
-                .trainingDate(LocalDate.of(2025, 2, 20))
+                .trainingDate(LocalDate.of(2025, FEBRUARY, 20))
                 .trainingDuration(90)
                 .trainee(validTrainee)
                 .trainer(validTrainer)
@@ -69,8 +71,8 @@ class TrainingRepositoryTest extends AbstractRepositoryTest<TrainingRepository> 
         TrainerTrainingSearchFilter filter = TrainerTrainingSearchFilter.builder()
                 .username("marcus.stone")
                 .traineeName("Liam Miller")
-                .fromDate(LocalDate.of(2025, 1, 1))
-                .toDate(LocalDate.of(2025, 1, 31))
+                .fromDate(LocalDate.of(2025, JANUARY, 1))
+                .toDate(LocalDate.of(2025, JANUARY, 31))
                 .build();
         List<Training> expectedTrainings = List.of(testDbClient.findTraining(1L));
 
@@ -115,8 +117,8 @@ class TrainingRepositoryTest extends AbstractRepositoryTest<TrainingRepository> 
                 .username("liam.miller")
                 .trainerName("Marcus Stone")
                 .trainingTypeName("CARDIO")
-                .fromDate(LocalDate.of(2025, 1, 1))
-                .toDate(LocalDate.of(2025, 1, 31))
+                .fromDate(LocalDate.of(2025, JANUARY, 1))
+                .toDate(LocalDate.of(2025, JANUARY, 31))
                 .build();
         List<Training> expectedTrainings = List.of(testDbClient.findTraining(1L));
 

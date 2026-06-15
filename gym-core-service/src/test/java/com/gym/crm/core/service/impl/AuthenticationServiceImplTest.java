@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.Optional;
 
+import static java.time.Month.JANUARY;
 import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -137,7 +138,7 @@ class AuthenticationServiceImplTest {
     void shouldLogoutSuccessfully() {
         String token = "valid-token";
         String jti = "test-jti";
-        Date expiration = Date.from(LocalDate.of(2024, 1, 1).atStartOfDay(UTC).toInstant());
+        Date expiration = Date.from(LocalDate.of(2024, JANUARY, 1).atStartOfDay(UTC).toInstant());
         JwtPayload payload = new JwtPayload(USERNAME, jti, expiration);
 
         when(jwtService.getPayload(token)).thenReturn(payload);

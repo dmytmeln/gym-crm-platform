@@ -28,6 +28,7 @@ import static com.gym.crm.core.exception.ApiError.NOT_FOUND_ERROR;
 import static com.gym.crm.core.exception.ApiError.SERVICE_ERROR;
 import static com.gym.crm.core.exception.ApiError.VALIDATION_ERROR;
 import static com.gym.crm.core.helper.JsonUtil.readJson;
+import static java.time.Month.JULY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -215,7 +216,7 @@ class TrainerRestControllerTest extends AbstractRestControllerTest {
                 .trainingName("Morning Yoga")
                 .trainingType("Yoga")
                 .traineeName("billy.herrington")
-                .trainingDate(LocalDate.of(2025, 7, 20))
+                .trainingDate(LocalDate.of(2025, JULY, 20))
                 .trainingDuration(55);
 
         when(facade.getTrainerTrainings(any())).thenReturn(List.of(trainingResponse));

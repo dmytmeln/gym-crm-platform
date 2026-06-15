@@ -18,6 +18,8 @@ import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTraine
 import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTrainerConfigForExisting;
 import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTrainingConfigForExisting;
 import static com.gym.crm.core.helper.EntityRecursiveComparisonConfigs.getTrainingTypeConfigForDirectFields;
+import static java.time.Month.APRIL;
+import static java.time.Month.JANUARY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TraineeRepositoryTest extends AbstractRepositoryTest<TraineeRepository> {
@@ -43,7 +45,7 @@ class TraineeRepositoryTest extends AbstractRepositoryTest<TraineeRepository> {
         Trainee validTrainee = Trainee.builder()
                 .user(validUser)
                 .address("Malibu, CA")
-                .dateOfBirth(LocalDate.of(1965, 4, 4))
+                .dateOfBirth(LocalDate.of(1965, APRIL, 4))
                 .build();
 
         Trainee actual = repository.save(validTrainee);
@@ -121,7 +123,7 @@ class TraineeRepositoryTest extends AbstractRepositoryTest<TraineeRepository> {
                 .build();
         Trainee updatedTrainee = existingTrainee.toBuilder()
                 .address("Updated Address")
-                .dateOfBirth(LocalDate.of(1995, 1, 1))
+                .dateOfBirth(LocalDate.of(1995, JANUARY, 1))
                 .user(updatedUser)
                 .trainers(new HashSet<>(expectedTrainers))
                 .build();

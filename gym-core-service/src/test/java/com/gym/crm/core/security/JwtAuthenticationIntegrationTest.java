@@ -35,6 +35,7 @@ import static com.gym.crm.core.exception.ApiError.AUTHENTICATION_ERROR;
 import static com.gym.crm.core.exception.ApiError.AUTHORIZATION_ERROR;
 import static com.gym.crm.core.exception.ApiError.IP_BLOCKED_ERROR;
 import static com.gym.crm.core.exception.ApiError.USER_DEACTIVATED_ERROR;
+import static java.time.Month.MAY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -170,7 +171,7 @@ class JwtAuthenticationIntegrationTest {
                 .firstName("Liam")
                 .lastName("Miller")
                 .isActive(true)
-                .dateOfBirth(LocalDate.of(1990, 5, 15))
+                .dateOfBirth(LocalDate.of(1990, MAY, 15))
                 .address("NYC");
 
         ResponseEntity<TraineeGetResponse> actual = restTemplate.exchange(request, TraineeGetResponse.class);
@@ -284,7 +285,7 @@ class JwtAuthenticationIntegrationTest {
                 .trainerUsername(EXISTING_TRAINER_USERNAME)
                 .traineeUsername(EXISTING_TRAINEE_USERNAME)
                 .trainingName("dummy")
-                .trainingDate(LocalDate.of(2026, 5, 15))
+                .trainingDate(LocalDate.of(2026, MAY, 15))
                 .trainingDuration(10);
         RequestEntity<TrainingCreateRequest> request = RequestEntity
                 .post(TRAININGS_ENDPOINT)

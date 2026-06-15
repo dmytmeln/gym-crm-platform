@@ -32,6 +32,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.time.Month.AUGUST;
+import static java.time.Month.JANUARY;
+import static java.time.Month.MAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -89,7 +92,7 @@ class GymFacadeIntegrationTest {
     @Test
     void shouldCreateTrainee() {
         TraineeCreateRequest request = new TraineeCreateRequest("Liam", "Miller")
-                .dateOfBirth(LocalDate.of(1990, 1, 1))
+                .dateOfBirth(LocalDate.of(1990, JANUARY, 1))
                 .address("123 Test St");
 
         TraineeCreateResponse actual = facade.createTrainee(request);
@@ -103,7 +106,7 @@ class GymFacadeIntegrationTest {
     void shouldUpdateTrainee() {
         TraineeUpdateRequest request = new TraineeUpdateRequest("Updated", "Name", true)
                 .address("Updated Address")
-                .dateOfBirth(LocalDate.of(1995, 5, 15));
+                .dateOfBirth(LocalDate.of(1995, MAY, 15));
 
         TraineeUpdateResponse actual = facade.updateTrainee(TRAINEE_USERNAME, request);
 
@@ -201,7 +204,7 @@ class GymFacadeIntegrationTest {
         request.setTraineeUsername(TRAINEE_USERNAME);
         request.setTrainerUsername(TRAINER_USERNAME);
         request.setTrainingName("Evening Yoga");
-        request.setTrainingDate(LocalDate.of(2025, 8, 15));
+        request.setTrainingDate(LocalDate.of(2025, AUGUST, 15));
         request.setTrainingDuration(45);
 
         facade.createTraining(request);

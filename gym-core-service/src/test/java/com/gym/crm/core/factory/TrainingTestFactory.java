@@ -7,6 +7,8 @@ import com.gym.crm.core.entity.TrainingType;
 
 import java.time.LocalDate;
 
+import static java.time.Month.APRIL;
+
 public class TrainingTestFactory {
 
     public static final Long DEFAULT_TRAINING_ID = 1L;
@@ -14,7 +16,7 @@ public class TrainingTestFactory {
     public static final Long DEFAULT_TRAINER_ID = 2L;
     public static final String DEFAULT_TRAINING_NAME = "Morning Workout";
     public static final int DEFAULT_DURATION = 60;
-    public static final LocalDate DEFAULT_DATE = LocalDate.of(2026, 4, 15);
+    public static final LocalDate DEFAULT_DATE = LocalDate.of(2026, APRIL, 15);
     public static final Long DEFAULT_TRAINING_TYPE_ID = 1L;
     public static final String DEFAULT_TRAINING_TYPE_NAME = "STRENGTH";
 

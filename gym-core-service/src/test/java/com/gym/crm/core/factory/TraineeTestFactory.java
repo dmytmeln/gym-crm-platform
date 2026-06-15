@@ -5,6 +5,8 @@ import com.gym.crm.core.entity.User;
 
 import java.time.LocalDate;
 
+import static java.time.Month.JANUARY;
+
 public class TraineeTestFactory {
 
     public static final Long DEFAULT_TRAINEE_ID = 1L;
@@ -15,7 +17,7 @@ public class TraineeTestFactory {
     public static final String DEFAULT_PASSWORD = "password123";
     public static final boolean DEFAULT_ACTIVE = true;
     public static final String DEFAULT_ADDRESS = "123 Main St";
-    public static final LocalDate DEFAULT_DATE_OF_BIRTH = LocalDate.of(1990, 1, 1);
+    public static final LocalDate DEFAULT_DATE_OF_BIRTH = LocalDate.of(1990, JANUARY, 1);
 
     public static Trainee.TraineeBuilder getDefaultTraineeBuilder() {
         return Trainee.builder()

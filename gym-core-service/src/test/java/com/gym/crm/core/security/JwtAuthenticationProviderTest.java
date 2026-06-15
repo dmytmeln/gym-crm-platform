@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
+import static java.time.Month.JANUARY;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,7 +36,7 @@ class JwtAuthenticationProviderTest {
     private static final String TOKEN = "validToken";
     private static final String JTI = "test-jti";
     private static final JwtPayload PAYLOAD = new JwtPayload(USERNAME, JTI,
-            Date.from(LocalDate.of(2024, 1, 1).atStartOfDay(UTC).toInstant()));
+            Date.from(LocalDate.of(2024, JANUARY, 1).atStartOfDay(UTC).toInstant()));
 
     @Mock
     private JwtService jwtService;

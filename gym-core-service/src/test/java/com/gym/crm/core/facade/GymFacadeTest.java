@@ -65,6 +65,7 @@ import static com.gym.crm.core.factory.TrainerTestFactory.DEFAULT_TRAINER_ID;
 import static com.gym.crm.core.factory.TrainerTestFactory.buildTrainerWithId;
 import static com.gym.crm.core.factory.TrainingTestFactory.DEFAULT_TRAINING_ID;
 import static com.gym.crm.core.factory.TrainingTestFactory.buildTrainingWithId;
+import static java.time.Month.JULY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -611,8 +612,8 @@ class GymFacadeTest {
     void shouldGetTrainerTrainings() {
         TrainerTrainingSearchFilter filter = TrainerTrainingSearchFilter.builder()
                 .username(USERNAME)
-                .fromDate(LocalDate.of(2025, 7, 1))
-                .toDate(LocalDate.of(2025, 7, 31))
+                .fromDate(LocalDate.of(2025, JULY, 1))
+                .toDate(LocalDate.of(2025, JULY, 31))
                 .traineeName("Liam Miller")
                 .build();
         Training training = buildTrainingWithId(DEFAULT_TRAINING_ID);
@@ -620,7 +621,7 @@ class GymFacadeTest {
                 .trainingName("Morning Cardio")
                 .trainingType("Cardio")
                 .traineeName("liam.miller")
-                .trainingDate(LocalDate.of(2025, 7, 20))
+                .trainingDate(LocalDate.of(2025, JULY, 20))
                 .trainingDuration(55);
         List<Training> trainings = List.of(training);
         List<GetTrainerTrainingResponse> expected = List.of(response);
@@ -718,7 +719,7 @@ class GymFacadeTest {
         request.setTraineeUsername(DEFAULT_USERNAME);
         request.setTrainerUsername("trainer.test");
         request.setTrainingName("Morning Cardio");
-        request.setTrainingDate(LocalDate.of(2025, 7, 20));
+        request.setTrainingDate(LocalDate.of(2025, JULY, 20));
         request.setTrainingDuration(55);
 
         return request;
