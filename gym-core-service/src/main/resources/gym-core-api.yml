@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
-  title: GCA API
-  description: API for managing trainees, their profiles, trainers, and training schedules
+  title: Gym Core Service API
+  description: API for Gym Core Service managing trainees, their profiles, trainers, and training schedules
   version: '1.0'
 
 servers:
-  - url: http://localhost:8080/gym-crm/api/v1
+  - url: http://localhost:8080/gym-crm/core/api/v1
     description: Local development server
 
 tags:

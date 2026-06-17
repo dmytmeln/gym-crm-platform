@@ -23,9 +23,9 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("GCA API")
+                        .title("Gym Core Service API")
                         .version("1.0.0")
-                        .description("API for managing trainees, their profiles, trainers, and training schedules")
+                        .description("API for Gym Core Service managing trainees, their profiles, trainers, and training schedules")
                         .contact(new Contact().name("Gym CRM Team")))
                 .servers(List.of(new Server().url("/gym-crm")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))

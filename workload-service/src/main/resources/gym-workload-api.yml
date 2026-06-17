@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: Gym Workload Service API
+  description: API for Gym Workload Service managing trainers' monthly workload summaries
+  version: '1.0'
+
+servers:
+  - url: http://localhost:8081/gym-crm/workload/api/v1
+    description: Local development server
+
+tags:
+  - name: Workload
+    description: Operations related to trainer workload
+
+paths:
+  /trainer-workloads:
+    post:
+      tags:
+        - Workload
+      summary: Update trainer workload
+      description: Adds or deletes training hours for a trainer's monthly summary
+      operationId: updateTrainerWorkload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainerWorkloadUpdateRequest'
+      responses:
+        '200':
+          description: Workload updated successfully
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+
+  /trainer-workloads/{username}:
+    get:
+      tags:
+        - Workload
+      summary: Get trainer workload
+      description: Retrieves the trainer's monthly workload summary for a specific year and month
+      operationId: getTrainerWorkload
+      parameters:
+        - $ref: '#/components/parameters/Username'
+        - $ref: '#/components/parameters/Year'
+        - $ref: '#/components/parameters/Month'
+      responses:
+        '200':
+          description: Trainer workload retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainerWorkloadResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+
+components:
+  parameters:
+    Username:
+      name: username
+      in: path
+      description: The username of the trainer
+      required: true
+      schema:
+        type: string
+        pattern: ^[a-zA-Z]+\.[a-zA-Z]+(\d+)?$
+        maxLength: 220
+        example: marcus.stone
+    Year:
+      name: year
+      in: query
+      description: The calendar year of the workload
+      required: true
+      schema:
+        type: integer
+        example: 2025
+    Month:
+      name: month
+      in: query
+      description: The calendar month name of the workload
+      required: true
+      schema:
+        type: string
+        enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+        example: JULY
+  schemas:
+    TrainerWorkloadUpdateRequest:
+      type: object
+      required:
+        - username
+        - firstName
+        - lastName
+        - isActive
+        - trainingDate
+        - trainingDuration
+        - actionType
+      properties:
+        username:
+          type: string
+          description: Trainer's username
+          pattern: ^[a-zA-Z]+\.[a-zA-Z]+(\d+)?$
+          maxLength: 220
+          example: marcus.stone
+        firstName:
+          type: string
+          description: Trainer's first name
+          maxLength: 100
+          minLength: 1
+          pattern: '.*\S.*'
+          example: Marcus
+        lastName:
+          type: string
+          description: Trainer's last name
+          maxLength: 100
+          minLength: 1
+          pattern: '.*\S.*'
+          example: Stone
+        isActive:
+          type: boolean
+          description: Indicates if the trainer is active
+          example: true
+        trainingDate:
+          type: string
+          format: date
+          description: The date of the training
+          example: '2025-07-20'
+        trainingDuration:
+          type: integer
+          description: Training duration in minutes
+          minimum: 1
+          example: 60
+        actionType:
+          type: string
+          description: The type of action to perform on the workload
+          enum:
+            - ADD
+            - DELETE
+          example: ADD
+    TrainerWorkloadResponse:
+      type: object
+      required:
+        - trainingWorkingHours
+      properties:
+        trainingWorkingHours:
+          type: integer
+          description: Total training working hours in minutes for the month
+          example: 120
+    ErrorResponse:
+      type: object
+      required:
+        - errorCode
+        - errorMessage
+      properties:
+        errorCode:
+          type: integer
+          example: 2760
+        errorMessage:
+          type: string
+          example: "Validation error: username must not be empty"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token authentication (JWT)
+security:
+  - bearerAuth: [ ]
