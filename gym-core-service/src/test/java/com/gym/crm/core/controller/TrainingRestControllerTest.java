@@ -9,6 +9,7 @@ import org.hibernate.HibernateException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -310,6 +312,34 @@ class TrainingRestControllerTest extends AbstractRestControllerTest {
         ErrorResponse actualErrorResponse = objectMapper.readValue(actualResponseBody, ErrorResponse.class);
         assertThat(actualErrorResponse.getErrorCode()).isEqualTo(AUTHENTICATION_ERROR.getCode());
         assertThat(actualErrorResponse.getErrorMessage()).isEqualTo(AUTHENTICATION_ERROR.getMessage());
+    }
+
+    @Test
+    @WithMockUser(username = "marcus.stone", roles = "TRAINER")
+    void shouldDeleteTrainingWhenRequestIsValid() throws Exception {
+        Long id = 42L;
+
+        mockMvc.perform(delete(TRAININGS_ENDPOINT + "/{id}", id))
+                .andExpect(status().isOk());
+
+        verify(facade).deleteTraining(id, "marcus.stone");
+    }
+
+    @Test
+    @WithMockUser(username = "marcus.stone", roles = "TRAINER")
+    void shouldReturn404WhenTrainingNotFoundOnDeleteTraining() throws Exception {
+        Long id = 42L;
+        EntityNotFoundException exception = new EntityNotFoundException("Training not found with ID: " + id);
+        doThrow(exception).when(facade).deleteTraining(id, "marcus.stone");
+
+        String actualResponseBody = mockMvc.perform(delete(TRAININGS_ENDPOINT + "/{id}", id))
+                .andExpect(status().isNotFound())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ErrorResponse actualErrorResponse = objectMapper.readValue(actualResponseBody, ErrorResponse.class);
+        assertThat(actualErrorResponse.getErrorCode()).isEqualTo(NOT_FOUND_ERROR.getCode());
     }
 
     private TrainingCreateRequest buildTrainingCreateRequest(String traineeUsername,

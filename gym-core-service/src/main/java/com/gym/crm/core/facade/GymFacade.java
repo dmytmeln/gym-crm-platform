@@ -197,6 +197,13 @@ public class GymFacade {
         trainingService.createTraining(training);
     }
 
+    public void deleteTraining(Long id, String trainerUsername) {
+        Objects.requireNonNull(id, "Training ID cannot be null");
+        Objects.requireNonNull(trainerUsername, "Trainer username cannot be null");
+
+        trainingService.deleteTraining(id, trainerUsername);
+    }
+
     public List<TrainingTypeResponse> getAllTrainingTypes() {
         List<TrainingType> trainingTypes = trainingService.getAllTrainingTypes();
         return trainingMapper.toTrainingTypeResponseList(trainingTypes);
