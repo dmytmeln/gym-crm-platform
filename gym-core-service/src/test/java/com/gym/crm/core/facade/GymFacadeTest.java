@@ -684,6 +684,32 @@ class GymFacadeTest {
     }
 
     @Test
+    void shouldDeleteTrainingWhenIdIsValid() {
+        Long id = 42L;
+        String username = "trainer.user";
+
+        facade.deleteTraining(id, username);
+
+        verify(trainingService).deleteTraining(id, username);
+    }
+
+    @Test
+    void shouldThrowNullPointerWhenDeletingNullTrainingId() {
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> facade.deleteTraining(null, "username"));
+
+        assertEquals("Training ID cannot be null", exception.getMessage());
+        verifyNoInteractions(trainingService);
+    }
+
+    @Test
+    void shouldThrowNullPointerWhenDeletingNullTrainerUsername() {
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> facade.deleteTraining(42L, null));
+
+        assertEquals("Trainer username cannot be null", exception.getMessage());
+        verifyNoInteractions(trainingService);
+    }
+
+    @Test
     void shouldGetAllTrainingTypesAndMapToResponseList() {
         TrainingType trainingType = TrainingType.builder().id(1L).trainingTypeName("Cardio").build();
         TrainingTypeResponse expected = new TrainingTypeResponse().id(1).name("Cardio");

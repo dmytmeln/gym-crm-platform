@@ -11,4 +11,6 @@ public interface TrainingService {
 
     List<TrainingType> getAllTrainingTypes();
 
+    void deleteTraining(Long id, String trainerUsername);
+
 }

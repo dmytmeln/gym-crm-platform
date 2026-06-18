@@ -1,5 +1,6 @@
 package com.gym.crm.core.service.impl;
 
+import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.dto.filter.TraineeTrainingSearchFilter;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,6 +41,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final ProfileCredentialGenerator credentialGenerator;
     private final PasswordEncoder passwordEncoder;
     private final TraineeTrainingCriteriaBuilder trainingCriteriaBuilder;
+    private final WorkloadClientFacade workloadClientFacade;
 
     @Override
     @Transactional
@@ -220,8 +223,15 @@ public class TraineeServiceImpl implements TraineeService {
             return false;
         }
 
-        traineeRepository.delete(traineeOpt.get());
+        Trainee trainee = traineeOpt.get();
+        List<Training> trainings = new ArrayList<>(trainee.getTrainings());
+
+        traineeRepository.delete(trainee);
+        traineeRepository.flush();
         log.info("Trainee with username: {} deleted successfully", username);
+
+        trainings.forEach(workloadClientFacade::deleteWorkload);
+
         return true;
     }
 

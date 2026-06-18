@@ -1,5 +1,6 @@
 package com.gym.crm.core.service.impl;
 
+import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
 import com.gym.crm.core.entity.Training;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,6 +52,9 @@ class TrainingServiceImplTest {
     @Mock
     private TrainingTypeRepository trainingTypeRepository;
 
+    @Mock
+    private WorkloadClientFacade workloadClientFacade;
+
     @InjectMocks
     private TrainingServiceImpl service;
 
@@ -76,6 +81,7 @@ class TrainingServiceImplTest {
         verify(traineeRepository).findByUsername(TRAINEE_USERNAME);
         verify(trainerRepository).findByUsername(TRAINER_USERNAME);
         verify(trainingRepository).save(any(Training.class));
+        verify(workloadClientFacade).addWorkload(expected);
     }
 
     @Test
@@ -172,6 +178,49 @@ class TrainingServiceImplTest {
         assertNotNull(actual);
         assertEquals(expected, actual);
         verify(trainingTypeRepository).findAll();
+    }
+
+    @Test
+    void shouldDeleteTrainingWhenExists() {
+        Long id = 42L;
+        Training training = buildTrainingWithUsernames();
+
+        when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
+
+        service.deleteTraining(id, TRAINER_USERNAME);
+
+        verify(trainingRepository).findById(id);
+        verify(workloadClientFacade).deleteWorkload(training);
+        verify(trainingRepository).delete(training);
+    }
+
+    @Test
+    void shouldThrowAccessDeniedWhenTrainerIsNotOwner() {
+        Long id = 42L;
+        Training training = buildTrainingWithUsernames();
+
+        when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
+
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> service.deleteTraining(id, "other.trainer"));
+
+        assertEquals("Access Denied: You are not the trainer of this training", exception.getMessage());
+        verify(trainingRepository).findById(id);
+        verifyNoInteractions(workloadClientFacade);
+        verify(trainingRepository, never()).delete(any(Training.class));
+    }
+
+    @Test
+    void shouldThrowEntityNotFoundWhenTrainingDoesNotExist() {
+        Long id = 42L;
+
+        when(trainingRepository.findById(id)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> service.deleteTraining(id, TRAINER_USERNAME));
+
+        assertEquals("Training not found with ID: " + id, exception.getMessage());
+        verify(trainingRepository).findById(id);
+        verifyNoInteractions(workloadClientFacade);
+        verify(trainingRepository, never()).delete(any(Training.class));
     }
 
     private Training buildTrainingWithUsernames() {

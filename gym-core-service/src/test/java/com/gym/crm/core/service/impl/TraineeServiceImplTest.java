@@ -1,5 +1,6 @@
 package com.gym.crm.core.service.impl;
 
+import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.dto.filter.TraineeTrainingSearchFilter;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
@@ -21,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ import static com.gym.crm.core.factory.TraineeTestFactory.buildTraineeWithUserna
 import static com.gym.crm.core.factory.TraineeTestFactory.buildTraineeWithoutCredentials;
 import static com.gym.crm.core.factory.TraineeTestFactory.buildTraineeWithoutUser;
 import static com.gym.crm.core.factory.TrainerTestFactory.buildTrainerWithId;
+import static java.time.Month.MAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -65,6 +68,9 @@ class TraineeServiceImplTest {
 
     @Mock
     private TraineeTrainingCriteriaBuilder trainingCriteriaBuilder;
+
+    @Mock
+    private WorkloadClientFacade workloadClientFacade;
 
     @InjectMocks
     private TraineeServiceImpl service;
@@ -350,7 +356,13 @@ class TraineeServiceImplTest {
 
     @Test
     void shouldDeleteTraineeByUsernameSuccessfully() {
-        Trainee trainee = buildTraineeWithUsername(DEFAULT_USERNAME);
+        Training training = Training.builder()
+                .trainingDate(LocalDate.of(2025, MAY, 24))
+                .trainingDuration(60)
+                .build();
+        Trainee trainee = buildTraineeWithUsername(DEFAULT_USERNAME).toBuilder()
+                .trainings(List.of(training))
+                .build();
 
         when(repository.findByUsername(DEFAULT_USERNAME)).thenReturn(Optional.of(trainee));
 
@@ -358,6 +370,7 @@ class TraineeServiceImplTest {
 
         assertTrue(result);
         verify(repository).delete(trainee);
+        verify(workloadClientFacade).deleteWorkload(training);
     }
 
     @Test

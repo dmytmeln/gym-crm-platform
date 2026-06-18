@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.repository.TraineeRepository;
 import com.gym.crm.core.service.impl.TraineeServiceImpl;
@@ -28,6 +29,9 @@ class LoggingTest {
 
     @Mock
     private TraineeRepository traineeRepository;
+
+    @Mock
+    private WorkloadClientFacade workloadClientFacade;
 
     @InjectMocks
     private TraineeServiceImpl service;

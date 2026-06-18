@@ -1,5 +1,6 @@
 package com.gym.crm.core.service.impl;
 
+import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
 import com.gym.crm.core.entity.Training;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +43,9 @@ class TrainingServiceSecurityTest {
 
     @MockitoBean
     private TrainingTypeRepository trainingTypeRepository;
+
+    @MockitoBean
+    private WorkloadClientFacade workloadClientFacade;
 
     @Autowired
     private TrainingService service;
@@ -121,6 +126,31 @@ class TrainingServiceSecurityTest {
         assertThat(result)
                 .isNotNull()
                 .isEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = "marcus.stone", roles = "TRAINER")
+    void shouldAllowDeleteTrainingWhenIsTrainerOwner() {
+        Long id = 42L;
+        User trainerUser = User.builder().username("marcus.stone").build();
+        Trainer trainer = Trainer.builder().user(trainerUser).build();
+        Training training = Training.builder().id(id).trainer(trainer).build();
+
+        when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
+
+        assertThatNoException().isThrownBy(() -> service.deleteTraining(id, "marcus.stone"));
+    }
+
+    @Test
+    @WithMockUser(username = "other.trainer", roles = "TRAINER")
+    void shouldDenyDeleteTrainingWhenIsNotTrainerOwner() {
+        assertThatExceptionOfType(AccessDeniedException.class).isThrownBy(() -> service.deleteTraining(42L, "marcus.stone"));
+    }
+
+    @Test
+    @WithMockUser(username = "liam.miller", roles = "TRAINEE")
+    void shouldDenyDeleteTrainingWhenIsTrainee() {
+        assertThatExceptionOfType(AccessDeniedException.class).isThrownBy(() -> service.deleteTraining(42L, "marcus.stone"));
     }
 
 }

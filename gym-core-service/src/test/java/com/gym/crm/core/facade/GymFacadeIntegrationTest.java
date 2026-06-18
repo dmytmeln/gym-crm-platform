@@ -21,6 +21,7 @@ import com.gym.crm.core.config.MySqlContainerTestConfig;
 import com.gym.crm.core.config.TestDataset;
 import com.gym.crm.core.dto.filter.TraineeTrainingSearchFilter;
 import com.gym.crm.core.dto.filter.TrainerTrainingSearchFilter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,10 +29,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.wiremock.spring.EnableWireMock;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.time.Month.AUGUST;
 import static java.time.Month.JANUARY;
 import static java.time.Month.MAY;
@@ -40,17 +48,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.services.workload.url=http://localhost:${wiremock.server.port}" + GymFacadeIntegrationTest.WORKLOAD_BASE_PATH)
 @ActiveProfiles("test")
 @TestDataset
+@EnableWireMock
 class GymFacadeIntegrationTest {
 
+    static final String WORKLOAD_BASE_PATH = "/gym-crm/workload/api/v1";
+
+    private static final String WORKLOAD_ENDPOINT = WORKLOAD_BASE_PATH + "/trainer-workloads";
     private static final String TRAINEE_USERNAME = "liam.miller";
     private static final String TRAINER_USERNAME = "marcus.stone";
     private static final String TRAINING_NAME = "Morning HIIT";
 
     @Autowired
     private GymFacade facade;
+
+    @BeforeEach
+    void setUpWireMock() {
+        stubFor(post(urlEqualTo(WORKLOAD_ENDPOINT))
+                .willReturn(aResponse().withStatus(200)));
+    }
 
     @DynamicPropertySource
     static void setMySqlProperties(DynamicPropertyRegistry registry) {
@@ -145,6 +163,7 @@ class GymFacadeIntegrationTest {
         boolean actual = facade.deleteTraineeByUsername(TRAINEE_USERNAME);
 
         assertTrue(actual);
+        verify(postRequestedFor(urlEqualTo(WORKLOAD_ENDPOINT)));
     }
 
     @Test
@@ -216,6 +235,7 @@ class GymFacadeIntegrationTest {
         assertNotNull(trainings);
         assertEquals(2, trainings.size());
         assertTrue(trainings.stream().anyMatch(t -> "Evening Yoga".equals(t.getTrainingName())));
+        verify(postRequestedFor(urlEqualTo(WORKLOAD_ENDPOINT)));
     }
 
     @Test
