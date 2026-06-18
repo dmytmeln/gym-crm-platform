@@ -39,15 +39,15 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getFirstName()).isEqualTo("Marcus");
-        assertThat(actualWorkload.getLastName()).isEqualTo("Stone");
-        assertThat(actualWorkload.getIsActive()).isTrue();
-        assertThat(actualWorkload.getYears()).hasSize(1);
-        assertThat(actualWorkload.getYears().getFirst().getYear()).isEqualTo(2025);
-        assertThat(actualWorkload.getYears().getFirst().getMonths()).hasSize(1);
-        assertThat(actualWorkload.getYears().getFirst().getMonths().getFirst().getMonth()).isEqualTo(JUNE);
-        assertThat(actualWorkload.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(60);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getFirstName()).isEqualTo("Marcus");
+        assertThat(actual.getLastName()).isEqualTo("Stone");
+        assertThat(actual.getIsActive()).isTrue();
+        assertThat(actual.getYears()).hasSize(1);
+        assertThat(actual.getYears().getFirst().getYear()).isEqualTo(2025);
+        assertThat(actual.getYears().getFirst().getMonths()).hasSize(1);
+        assertThat(actual.getYears().getFirst().getMonths().getFirst().getMonth()).isEqualTo(JUNE);
+        assertThat(actual.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(60);
     }
 
     @Test
@@ -56,8 +56,8 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update);
 
-        Optional<TrainerWorkload> actualWorkloadOpt = repository.findByUsername(USERNAME);
-        assertThat(actualWorkloadOpt).isEmpty();
+        Optional<TrainerWorkload> actual = repository.findByUsername(USERNAME);
+        assertThat(actual).isEmpty();
     }
 
     @Test
@@ -68,8 +68,8 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update2);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(105);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(105);
     }
 
     @Test
@@ -80,8 +80,8 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update2);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears().getFirst().getMonths()).hasSize(2);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears().getFirst().getMonths()).hasSize(2);
     }
 
     @Test
@@ -92,8 +92,8 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update2);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears()).hasSize(2);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears()).hasSize(2);
     }
 
     @Test
@@ -104,8 +104,8 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update2);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(60);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(60);
     }
 
     @Test
@@ -116,8 +116,8 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update2);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears()).isEmpty();
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears()).isEmpty();
     }
 
     @Test
@@ -128,10 +128,10 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(update2);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears().getFirst().getMonths()).hasSize(1);
-        assertThat(actualWorkload.getYears().getFirst().getMonths().getFirst().getMonth()).isEqualTo(JUNE);
-        assertThat(actualWorkload.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(50);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears().getFirst().getMonths()).hasSize(1);
+        assertThat(actual.getYears().getFirst().getMonths().getFirst().getMonth()).isEqualTo(JUNE);
+        assertThat(actual.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(50);
     }
 
     @Test
@@ -140,18 +140,18 @@ class TrainerWorkloadServiceImplIntegrationTest {
         service.updateWorkload(update);
         TrainerWorkloadSearchFilter filter = new TrainerWorkloadSearchFilter(USERNAME, 2025, JUNE);
 
-        Integer actualHours = service.getWorkingHours(filter);
+        Integer actual = service.getWorkingHours(filter);
 
-        assertThat(actualHours).isEqualTo(60);
+        assertThat(actual).isEqualTo(60);
     }
 
     @Test
     void shouldReturnZeroWorkingHoursWhenNotExist() {
         TrainerWorkloadSearchFilter filter = new TrainerWorkloadSearchFilter("nonexistent.trainer", 2025, JUNE);
 
-        Integer actualHours = service.getWorkingHours(filter);
+        Integer actual = service.getWorkingHours(filter);
 
-        assertThat(actualHours).isZero();
+        assertThat(actual).isZero();
     }
 
     @Test
@@ -163,11 +163,11 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(updatedInfo);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getFirstName()).isEqualTo("NewFirstName");
-        assertThat(actualWorkload.getLastName()).isEqualTo("NewLastName");
-        assertThat(actualWorkload.getIsActive()).isFalse();
-        assertThat(actualWorkload.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(100);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getFirstName()).isEqualTo("NewFirstName");
+        assertThat(actual.getLastName()).isEqualTo("NewLastName");
+        assertThat(actual.getIsActive()).isFalse();
+        assertThat(actual.getYears().getFirst().getMonths().getFirst().getWorkingHours()).isEqualTo(100);
     }
 
     @Test
@@ -176,9 +176,9 @@ class TrainerWorkloadServiceImplIntegrationTest {
         service.updateWorkload(update);
         TrainerWorkloadSearchFilter filter = new TrainerWorkloadSearchFilter(USERNAME, 2026, JUNE);
 
-        Integer actualHours = service.getWorkingHours(filter);
+        Integer actual = service.getWorkingHours(filter);
 
-        assertThat(actualHours).isZero();
+        assertThat(actual).isZero();
     }
 
     @Test
@@ -187,9 +187,9 @@ class TrainerWorkloadServiceImplIntegrationTest {
         service.updateWorkload(update);
         TrainerWorkloadSearchFilter filter = new TrainerWorkloadSearchFilter(USERNAME, 2025, JULY);
 
-        Integer actualHours = service.getWorkingHours(filter);
+        Integer actual = service.getWorkingHours(filter);
 
-        assertThat(actualHours).isZero();
+        assertThat(actual).isZero();
     }
 
     @Test
@@ -202,9 +202,9 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(deleteJune);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears()).hasSize(1);
-        YearSummary yearSummary = actualWorkload.getYears().getFirst();
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears()).hasSize(1);
+        YearSummary yearSummary = actual.getYears().getFirst();
         assertThat(yearSummary.getYear()).isEqualTo(2025);
         assertThat(yearSummary.getMonths()).hasSize(1);
         assertThat(yearSummary.getMonths().getFirst().getMonth()).isEqualTo(JULY);
@@ -220,9 +220,9 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         service.updateWorkload(delete2026);
 
-        TrainerWorkload actualWorkload = repository.findByUsername(USERNAME).orElseThrow();
-        assertThat(actualWorkload.getYears()).hasSize(1);
-        assertThat(actualWorkload.getYears().getFirst().getYear()).isEqualTo(2025);
+        TrainerWorkload actual = repository.findByUsername(USERNAME).orElseThrow();
+        assertThat(actual.getYears()).hasSize(1);
+        assertThat(actual.getYears().getFirst().getYear()).isEqualTo(2025);
     }
 
     private TrainerWorkloadUpdate buildUpdate(TrainingDate trainingDate, int trainingDuration, ActionType actionType) {

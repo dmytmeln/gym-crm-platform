@@ -45,9 +45,9 @@ class TrainerWorkloadServiceImplTest {
 
         when(repository.findByUsername(USERNAME)).thenReturn(Optional.of(workload));
 
-        Integer actualHours = service.getWorkingHours(filter);
+        Integer actual = service.getWorkingHours(filter);
 
-        assertThat(actualHours).isEqualTo(60);
+        assertThat(actual).isEqualTo(60);
     }
 
     @Test
@@ -56,9 +56,9 @@ class TrainerWorkloadServiceImplTest {
 
         when(repository.findByUsername("nonexistent.trainer")).thenReturn(Optional.empty());
 
-        Integer actualHours = service.getWorkingHours(filter);
+        Integer actual = service.getWorkingHours(filter);
 
-        assertThat(actualHours).isZero();
+        assertThat(actual).isZero();
     }
 
     @Test

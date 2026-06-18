@@ -1,6 +1,7 @@
 package com.gym.crm.workload.exception;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -9,6 +10,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Getter
+@RequiredArgsConstructor
 public enum ApiError {
 
     VALIDATION_ERROR(2760, "Validation error", BAD_REQUEST),
@@ -19,11 +21,5 @@ public enum ApiError {
     private final int code;
     private final String message;
     private final HttpStatus status;
-
-    ApiError(int code, String message, HttpStatus status) {
-        this.code = code;
-        this.message = message;
-        this.status = status;
-    }
 
 }

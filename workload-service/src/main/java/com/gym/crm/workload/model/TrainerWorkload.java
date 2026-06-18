@@ -1,14 +1,18 @@
 package com.gym.crm.workload.model;
 
 import com.gym.crm.workload.dto.TrainingDate;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static lombok.AccessLevel.PRIVATE;
+
 @Getter
 @Builder(toBuilder = true)
+@AllArgsConstructor(access = PRIVATE)
 public class TrainerWorkload {
 
     private final String username;

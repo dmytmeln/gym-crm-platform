@@ -1,6 +1,7 @@
 package com.gym.crm.workload.model;
 
 import com.gym.crm.workload.dto.TrainingDate;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,17 +9,15 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
+import static lombok.AccessLevel.PRIVATE;
+
 @Getter
 @Builder(toBuilder = true)
+@AllArgsConstructor(access = PRIVATE)
 public class YearSummary {
 
     private final Integer year;
     private final List<MonthSummary> months;
-
-    private YearSummary(Integer year, List<MonthSummary> months) {
-        this.year = year;
-        this.months = months;
-    }
 
     public static YearSummary of(TrainingDate date, int duration) {
         MonthSummary monthSummary = MonthSummary.of(date.getMonth(), duration);

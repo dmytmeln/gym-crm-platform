@@ -27,6 +27,7 @@ public class TrainerWorkloadServiceImpl implements TrainerWorkloadService {
     @Override
     public Integer getWorkingHours(TrainerWorkloadSearchFilter filter) {
         log.info("Getting working hours for trainer: {}, year: {}, month: {}", filter.username(), filter.year(), filter.month());
+
         return repository.findByUsername(filter.username())
                 .flatMap(workload -> findYearSummary(workload, filter.year()))
                 .flatMap(year -> findMonthSummary(year, filter.month()))
