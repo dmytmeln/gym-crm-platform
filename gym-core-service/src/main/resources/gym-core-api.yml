@@ -716,6 +716,45 @@ paths:
         default:
           description: Unexpected error
 
+  /trainings/{id}:
+    delete:
+      tags:
+        - Training
+      summary: Delete training
+      description: Deletes a training session and updates the trainer's workload
+      operationId: deleteTraining
+      parameters:
+        - $ref: '#/components/parameters/TrainingId'
+      responses:
+        '200':
+          description: Training deleted successfully
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Training not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+
   /trainings/types:
     get:
       tags:
@@ -884,6 +923,15 @@ paths:
 
 components:
   parameters:
+    TrainingId:
+      name: id
+      in: path
+      description: Training ID
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 42
     Username:
       name: username
       in: path
