@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "38d6d22f-c314-488f-80b8-a13bd6a2e0cd",
+    "_postman_id": "096d53f2-c17c-4937-8cec-3a8d9d33363c",
     "name": "GIA API",
     "description": "```\nAPI for managing trainees, their profiles, trainers, and training schedules\n\n ```",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -568,6 +568,24 @@
                   "path": [
                     "trainings",
                     "types"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete training",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainings/{{trainingId}}",
+                  "host": [
+                    "{{coreBaseUrl}}{{coreBasePath}}"
+                  ],
+                  "path": [
+                    "trainings",
+                    "{{trainingId}}"
                   ]
                 }
               },
