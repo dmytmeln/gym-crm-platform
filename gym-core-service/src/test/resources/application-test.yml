@@ -23,6 +23,10 @@ spring:
       host: localhost
       port: 6379
 
+eureka:
+  client:
+    enabled: false
+
 app:
   security:
     jwt:
@@ -30,6 +34,10 @@ app:
       access-expiration-ms: 86400000
     cors:
       allowed-origins: https://editor.swagger.io/
+  services:
+    workload:
+      port: 8081
+      url: http://localhost:${app.services.workload.port}/gym-crm/workload/api/v1
 
 logging:
   level:

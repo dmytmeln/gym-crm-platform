@@ -1,6 +1,8 @@
 spring:
   application:
     name: workload-service
+  profiles:
+    active: local
 
 management:
   endpoints:
@@ -18,6 +20,11 @@ server:
   servlet:
     context-path: /gym-crm/workload
   port: 8081
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
 
 app:
   api:

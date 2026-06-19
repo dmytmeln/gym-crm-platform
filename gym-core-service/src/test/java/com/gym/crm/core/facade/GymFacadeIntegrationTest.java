@@ -24,11 +24,15 @@ import com.gym.crm.core.dto.filter.TrainerTrainingSearchFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.web.client.RestClient;
 import org.wiremock.spring.EnableWireMock;
 
 import java.time.LocalDate;
@@ -48,15 +52,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(properties = "app.services.workload.url=http://localhost:${wiremock.server.port}" + GymFacadeIntegrationTest.WORKLOAD_BASE_PATH)
+@SpringBootTest(properties = {"app.services.workload.port=${wiremock.server.port}", "spring.main.allow-bean-definition-overriding=true"})
 @ActiveProfiles("test")
 @TestDataset
 @EnableWireMock
 class GymFacadeIntegrationTest {
 
-    static final String WORKLOAD_BASE_PATH = "/gym-crm/workload/api/v1";
+    @TestConfiguration
+    static class TestConfig {
 
-    private static final String WORKLOAD_ENDPOINT = WORKLOAD_BASE_PATH + "/trainer-workloads";
+        @Bean("loadBalancedRestClientBuilder")
+        public RestClient.Builder loadBalancedRestClientBuilder(@Qualifier("baseRestClientBuilder") RestClient.Builder restClientBuilder) {
+            return restClientBuilder;
+        }
+
+    }
+
+    private static final String WORKLOAD_ENDPOINT = "/gym-crm/workload/api/v1/trainer-workloads";
     private static final String TRAINEE_USERNAME = "liam.miller";
     private static final String TRAINER_USERNAME = "marcus.stone";
     private static final String TRAINING_NAME = "Morning HIIT";

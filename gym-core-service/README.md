@@ -47,6 +47,13 @@ docker run --name gym-redis -p 6379:6379 -d redis
 
 ### Step 3: Run the Application
 
+> [!IMPORTANT]
+> The following platform microservices must be running for this service to function properly:
+> * **[Discovery Server](../discovery-server/README.md)**: Service registry required for Eureka discovery.
+> * **[Workload Service](../workload-service/README.md)**: Handles trainer workloads (communicated with via REST).
+>
+> Ensure these services are started before running the core service.
+
 You can run the core service using Maven from the service directory or from the root:
 
 **From the root directory:**

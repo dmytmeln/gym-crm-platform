@@ -1,5 +1,5 @@
 <configuration>
-    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="gym-core-service"/>
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="workload-service"/>
     <property name="LOG_DIR" value="logs"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

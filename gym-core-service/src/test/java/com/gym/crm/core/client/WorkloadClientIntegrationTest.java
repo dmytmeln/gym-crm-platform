@@ -25,16 +25,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@SpringBootTest(classes = {ClientConfig.class, WorkloadClientFacade.class}, properties =
-        "app.services.workload.url=http://localhost:${wiremock.server.port}" + WorkloadClientIntegrationTest.WORKLOAD_BASE_PATH)
+@SpringBootTest(classes = {ClientConfig.class, WorkloadClientFacade.class}, properties = "app.services.workload.port=${wiremock.server.port}")
 @ImportAutoConfiguration({RestClientAutoConfiguration.class, JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class})
 @ActiveProfiles("test")
 @EnableWireMock
 class WorkloadClientIntegrationTest {
 
-    static final String WORKLOAD_BASE_PATH = "/gym-crm/workload/api/v1";
-
-    private static final String WORKLOAD_ENDPOINT = WORKLOAD_BASE_PATH + "/trainer-workloads";
+    private static final String WORKLOAD_ENDPOINT = "/gym-crm/workload/api/v1/trainer-workloads";
 
     @Autowired
     private WorkloadClientFacade facade;

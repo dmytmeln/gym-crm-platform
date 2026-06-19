@@ -4,13 +4,20 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
   data:
     redis:
       host: ${REDIS_HOST}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVER_URL}
+  instance:
+    prefer-ip-address: true
 
 app:
   security:
@@ -21,6 +28,6 @@ app:
 
 logging:
   level:
-    root: WARN
-    org.springframework: WARN
-    com.gym.crm: INFO
+    root: INFO
+    org.springframework: INFO
+    com.gym.crm: DEBUG
