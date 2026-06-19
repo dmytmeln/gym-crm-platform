@@ -1,0 +1,12 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVER_URL}
+  instance:
+    prefer-ip-address: true
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    com.gym.crm: INFO

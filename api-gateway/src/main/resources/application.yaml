@@ -1,8 +1,11 @@
 spring:
   application:
-    name: discovery-server
+    name: api-gateway
   profiles:
     active: local
+
+server:
+  port: 8080
 
 management:
   endpoints:
@@ -16,12 +19,7 @@ management:
     tags:
       application: ${spring.application.name}
 
-server:
-  port: 8761
-
 eureka:
   client:
-    registerWithEureka: false
-    fetch-registry: false
-    service-url:
-      defaultZone: http://localhost:${server.port}/eureka/
+    registerWithEureka: true
+    fetchRegistry: true

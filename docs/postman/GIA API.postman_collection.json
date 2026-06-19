@@ -31,9 +31,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/auth/login",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/auth/login",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "auth",
@@ -61,9 +61,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/auth/login",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/auth/login",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "auth",
@@ -88,9 +88,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/auth/password",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/auth/password",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "auth",
@@ -106,9 +106,9 @@
                 "method": "POST",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/auth/logout",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/auth/logout",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "auth",
@@ -141,9 +141,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/register",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/register",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -159,9 +159,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/{{traineeUsername}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/{{traineeUsername}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -177,9 +177,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/{{traineeUsername}}/available-trainers",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/{{traineeUsername}}/available-trainers",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -196,9 +196,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/{{traineeUsername}}/trainings?fromDate={{traineeTrainingFromDate}}&toDate={{traineeTrainingToDate}}&trainerName={{traineeTrainingTrainerName}}&trainingType={{traineeTrainingTrainingType}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/{{traineeUsername}}/trainings?fromDate={{traineeTrainingFromDate}}&toDate={{traineeTrainingToDate}}&trainerName={{traineeTrainingTrainerName}}&trainingType={{traineeTrainingTrainingType}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -246,9 +246,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/{{traineeUsername}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/{{traineeUsername}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -273,9 +273,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/{{traineeUsername}}/trainers",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/{{traineeUsername}}/trainers",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -301,9 +301,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/{{traineeUsername}}/activation",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/{{traineeUsername}}/activation",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -320,9 +320,9 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainees/{{traineeUsername}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainees/{{traineeUsername}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainees",
@@ -379,9 +379,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainers/register",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainers/register",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainers",
@@ -397,9 +397,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainers/{{trainerUsername}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainers/{{trainerUsername}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainers",
@@ -415,9 +415,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainers/{{trainerUsername}}/trainings?fromDate={{trainerTrainingFromDate}}&toDate={{trainerTrainingToDate}}&traineeName={{trainerTrainingTraineeName}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainers/{{trainerUsername}}/trainings?fromDate={{trainerTrainingFromDate}}&toDate={{trainerTrainingToDate}}&traineeName={{trainerTrainingTraineeName}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainers",
@@ -460,9 +460,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainers/{{trainerUsername}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainers/{{trainerUsername}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainers",
@@ -487,9 +487,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainers/{{trainerUsername}}/activation",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainers/{{trainerUsername}}/activation",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainers",
@@ -544,9 +544,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainings",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainings",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainings"
@@ -561,9 +561,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainings/types",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainings/types",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainings",
@@ -579,9 +579,9 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{coreBaseUrl}}{{coreBasePath}}/trainings/{{trainingId}}",
+                  "raw": "{{gatewayHost}}{{coreBasePath}}/trainings/{{trainingId}}",
                   "host": [
-                    "{{coreBaseUrl}}{{coreBasePath}}"
+                    "{{gatewayHost}}{{coreBasePath}}"
                   ],
                   "path": [
                     "trainings",
@@ -616,9 +616,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{workloadBaseUrl}}{{workloadBasePath}}/trainer-workloads",
+                  "raw": "{{gatewayHost}}{{workloadBasePath}}/trainer-workloads",
                   "host": [
-                    "{{workloadBaseUrl}}{{workloadBasePath}}"
+                    "{{gatewayHost}}{{workloadBasePath}}"
                   ],
                   "path": [
                     "trainer-workloads"
@@ -633,9 +633,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{workloadBaseUrl}}{{workloadBasePath}}/trainer-workloads/{{trainerUsername}}?year={{workloadYear}}&month={{workloadMonth}}",
+                  "raw": "{{gatewayHost}}{{workloadBasePath}}/trainer-workloads/{{trainerUsername}}?year={{workloadYear}}&month={{workloadMonth}}",
                   "host": [
-                    "{{workloadBaseUrl}}{{workloadBasePath}}"
+                    "{{gatewayHost}}{{workloadBasePath}}"
                   ],
                   "path": [
                     "trainer-workloads",
