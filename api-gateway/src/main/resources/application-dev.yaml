@@ -1,0 +1,12 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVER_URL}
+  instance:
+    prefer-ip-address: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.gym.crm: DEBUG

@@ -67,11 +67,11 @@ cd gym-core-service
 mvn spring-boot:run
 ```
 
-The application runs on port 8080 under the context path `/gym-crm/core`.
+The application runs on port 8082 under the context path `/gym-crm/core`.
 
-* **Base API Path**: [http://localhost:8080/gym-crm/core/api/v1](http://localhost:8080/gym-crm/core/api/v1)
-* **OpenAPI / Swagger UI**: [http://localhost:8080/gym-crm/core/swagger-ui/index.html](http://localhost:8080/gym-crm/core/swagger-ui/index.html)
-* **OpenAPI Spec (JSON)**: [http://localhost:8080/gym-crm/core/v3/api-docs](http://localhost:8080/gym-crm/core/v3/api-docs)
+* **Base API Path**: [http://localhost:8082/gym-crm/core/api/v1](http://localhost:8082/gym-crm/core/api/v1)
+* **OpenAPI / Swagger UI**: [http://localhost:8082/gym-crm/core/swagger-ui/index.html](http://localhost:8082/gym-crm/core/swagger-ui/index.html)
+* **OpenAPI Spec (JSON)**: [http://localhost:8082/gym-crm/core/v3/api-docs](http://localhost:8082/gym-crm/core/v3/api-docs)
 * **OpenAPI Spec (YAML)**: [src/main/resources/gia-api.yml](src/main/resources/gym-core-api.yml) (can be loaded/edited in [Swagger Editor](https://editor.swagger.io/))
 
 ## Running Tests
@@ -94,29 +94,29 @@ Spring Boot Actuator and Micrometer are configured to expose system and custom m
 
 ### Endpoints
 
-* **Base Actuator Path**: [http://localhost:8080/gym-crm/core/actuator](http://localhost:8080/gym-crm/core/actuator)
+* **Base Actuator Path**: [http://localhost:8082/gym-crm/core/actuator](http://localhost:8082/gym-crm/core/actuator)
 
 #### Health Indicators
-* **Main Health Status**: [http://localhost:8080/gym-crm/core/actuator/health](http://localhost:8080/gym-crm/core/actuator/health)
-* **Database Health**: [http://localhost:8080/gym-crm/core/actuator/health/db](http://localhost:8080/gym-crm/core/actuator/health/db)
-* **Disk Write Health (Custom)**: [http://localhost:8080/gym-crm/core/actuator/health/diskWrite](http://localhost:8080/gym-crm/core/actuator/health/diskWrite)
-* **Hikari Connection Pool Saturation (Custom)**: [http://localhost:8080/gym-crm/core/actuator/health/hikariPoolSaturation](http://localhost:8080/gym-crm/core/actuator/health/hikariPoolSaturation)
+* **Main Health Status**: [http://localhost:8082/gym-crm/core/actuator/health](http://localhost:8082/gym-crm/core/actuator/health)
+* **Database Health**: [http://localhost:8082/gym-crm/core/actuator/health/db](http://localhost:8082/gym-crm/core/actuator/health/db)
+* **Disk Write Health (Custom)**: [http://localhost:8082/gym-crm/core/actuator/health/diskWrite](http://localhost:8082/gym-crm/core/actuator/health/diskWrite)
+* **Hikari Connection Pool Saturation (Custom)**: [http://localhost:8082/gym-crm/core/actuator/health/hikariPoolSaturation](http://localhost:8082/gym-crm/core/actuator/health/hikariPoolSaturation)
 
 #### Metrics
-* **Prometheus Metrics**: [http://localhost:8080/gym-crm/core/actuator/prometheus](http://localhost:8080/gym-crm/core/actuator/prometheus)
-* **Metrics Index**: [http://localhost:8080/gym-crm/core/actuator/metrics](http://localhost:8080/gym-crm/core/actuator/metrics)
+* **Prometheus Metrics**: [http://localhost:8082/gym-crm/core/actuator/prometheus](http://localhost:8082/gym-crm/core/actuator/prometheus)
+* **Metrics Index**: [http://localhost:8082/gym-crm/core/actuator/metrics](http://localhost:8082/gym-crm/core/actuator/metrics)
 
 ### Custom Metrics API
 
-* **User Registrations (`gym_crm_user_registrations_total`)**: [http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_user_registrations_total](http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_user_registrations_total)
+* **User Registrations (`gym_crm_user_registrations_total`)**: [http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_user_registrations_total](http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_user_registrations_total)
   * Tags: `role` (trainee, trainer), `status` (success, failure)
-* **Login Attempts (`gym_crm_login_attempts_total`)**: [http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_login_attempts_total](http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_login_attempts_total)
+* **Login Attempts (`gym_crm_login_attempts_total`)**: [http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_login_attempts_total](http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_login_attempts_total)
   * Tags: `status` (success, failure)
-* **Trainings Created (`gym_crm_trainings_created_total`)**: [http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_trainings_created_total](http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_trainings_created_total)
+* **Trainings Created (`gym_crm_trainings_created_total`)**: [http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_trainings_created_total](http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_trainings_created_total)
   * Tags: `training_type`
   * *Note: Returns 404 until at least one training has been created.*
-* **Training Search Duration (`gym_crm_search_duration_seconds`)**: [http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_search_duration_seconds](http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_search_duration_seconds)
+* **Training Search Duration (`gym_crm_search_duration_seconds`)**: [http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_search_duration_seconds](http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_search_duration_seconds)
   * Tags: `search_type` (trainee, trainer)
   * *Note: Returns 404 until at least one training search has been performed.*
-* **Active Users (`gym_crm_active_users`)**: [http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_active_users](http://localhost:8080/gym-crm/core/actuator/metrics/gym_crm_active_users)
+* **Active Users (`gym_crm_active_users`)**: [http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_active_users](http://localhost:8082/gym-crm/core/actuator/metrics/gym_crm_active_users)
   * Tags: `role` (trainee, trainer)
