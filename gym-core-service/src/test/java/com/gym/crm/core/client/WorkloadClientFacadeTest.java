@@ -16,7 +16,9 @@ import java.time.LocalDate;
 import static com.gia.openapi.model.TrainerWorkloadUpdateRequest.ActionTypeEnum.ADD;
 import static com.gia.openapi.model.TrainerWorkloadUpdateRequest.ActionTypeEnum.DELETE;
 import static java.time.Month.JUNE;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -61,14 +63,21 @@ class WorkloadClientFacadeTest {
     }
 
     @Test
-    void shouldLogAndNotPropagateExceptionWhenWorkloadClientThrows() {
+    void shouldPropagateExceptionWhenWorkloadClientThrows() {
         Training training = buildTestTraining();
 
         doThrow(new RuntimeException("API error")).when(workloadClient).updateTrainerWorkload(any());
 
-        facade.addWorkload(training);
+        assertThrows(RuntimeException.class, () -> facade.addWorkload(training));
 
         verify(workloadClient).updateTrainerWorkload(any());
+    }
+
+    @Test
+    void shouldNotThrowExceptionWhenFallbackIsCalled() {
+        Training training = buildTestTraining();
+
+        assertDoesNotThrow(() -> facade.fallbackUpdateWorkload(training, new RuntimeException("API error")));
     }
 
     private Training buildTestTraining() {

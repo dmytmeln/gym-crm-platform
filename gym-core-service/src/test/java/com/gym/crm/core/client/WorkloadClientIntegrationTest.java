@@ -7,11 +7,13 @@ import com.gym.crm.core.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerAutoConfiguration;
 import org.wiremock.spring.EnableWireMock;
 
 import java.time.LocalDate;
@@ -26,7 +28,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest(classes = {ClientConfig.class, WorkloadClientFacade.class}, properties = "app.services.workload.port=${wiremock.server.port}")
-@ImportAutoConfiguration({RestClientAutoConfiguration.class, JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class})
+@ImportAutoConfiguration({
+        RestClientAutoConfiguration.class,
+        JacksonAutoConfiguration.class,
+        HttpMessageConvertersAutoConfiguration.class,
+        AopAutoConfiguration.class,
+        CircuitBreakerAutoConfiguration.class
+})
 @ActiveProfiles("test")
 @EnableWireMock
 class WorkloadClientIntegrationTest {
