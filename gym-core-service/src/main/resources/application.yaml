@@ -43,6 +43,11 @@ server:
     context-path: /gym-crm/core
   port: 8080
 
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+
 app:
   api:
     base-path: /api/v1
@@ -51,4 +56,4 @@ app:
       access-expiration-ms: 86400000
   services:
     workload:
-      url: http://localhost:8081/gym-crm/workload/api/v1
+      url: http://workload-service/gym-crm/workload/api/v1

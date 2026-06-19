@@ -6,8 +6,9 @@
 
 ## Platform Services
 
+* **[Discovery Server](discovery-server/README.md)**: Service registry (Eureka Server) that enables other microservices to locate and communicate with each other.
+* **[Workload Service](workload-service/README.md)**: A service for managing and tracking trainer workload.
 * **[Gym Core Service](gym-core-service/README.md)**: The core CRM backend dealing with trainees, trainers, training sessions, and user authentication.
-* **Workload Service**: A service for managing and tracking trainer workload.
 
 ## Prerequisites
 
@@ -41,8 +42,13 @@ mvn clean install
 
 ### Step 3: Run the Services
 
-Please refer to individual service documentation for running each service:
-* **[Gym Core Service Setup & Run](gym-core-service/README.md)**
+For a fully functional platform, the services should be started in the following order:
+
+1. **[Discovery Server Setup & Run](discovery-server/README.md)** (Eureka Server, port `8761`)
+2. **[Workload Service Setup & Run](workload-service/README.md)** (Port `8081`)
+3. **[Gym Core Service Setup & Run](gym-core-service/README.md)** (Port `8080`)
+
+Please refer to individual service documentation for specific setup and configuration requirements.
 
 ---
 
