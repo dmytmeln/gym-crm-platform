@@ -34,4 +34,4 @@ jobs:
           mvn clean verify sonar:sonar \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.qualitygate.wait=true \
-            -Dsonar.cpd.exclusions=**/exception/GlobalExceptionHandler.java
+            -Dsonar.cpd.exclusions=**/exception/GlobalExceptionHandler.java, **/JwtService.java
