@@ -1,4 +1,4 @@
-package com.gym.crm.core.security;
+package com.gym.crm.workload.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -36,7 +36,6 @@ public class JwtService {
 
     public JwtPayload getPayload(String token) {
         Claims claims = extractAllClaims(token);
-
         return new JwtPayload(claims.getSubject(), claims.getId(), claims.getExpiration());
     }
 
@@ -60,19 +59,19 @@ public class JwtService {
                 .compact();
     }
 
-    private void parseToken(String token) {
-        Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token);
-    }
-
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private void parseToken(String token) {
+        Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parse(token);
     }
 
     private Key getSignInKey() {

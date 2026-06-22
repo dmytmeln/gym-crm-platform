@@ -4,3 +4,8 @@ eureka:
       defaultZone: ${DISCOVERY_SERVER_URL}
   instance:
     prefer-ip-address: true
+
+app:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}

@@ -8,10 +8,15 @@ import com.gym.crm.workload.dto.TrainerWorkloadUpdate;
 import com.gym.crm.workload.dto.TrainingDate;
 import com.gym.crm.workload.dto.TrainerWorkloadSearchFilter;
 import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
+import com.gym.crm.workload.security.JwtService;
 import com.gym.crm.workload.service.TrainerWorkloadService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import com.gym.crm.workload.security.SecurityConfig;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TrainerWorkloadsRestController.class)
+@Import(SecurityConfig.class)
+@WithMockUser
 class TrainerWorkloadsRestControllerTest {
 
     private static final String TRAINER_WORKLOADS_ENDPOINT = "/api/v1/trainer-workloads";
@@ -42,6 +49,9 @@ class TrainerWorkloadsRestControllerTest {
 
     @MockitoBean
     private TrainerWorkloadMapper mapper;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -107,6 +117,15 @@ class TrainerWorkloadsRestControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(VALIDATION_ERROR.getCode()))
                 .andExpect(jsonPath("$.errorMessage", startsWith("Method parameter 'month': Failed to convert value of type 'java.lang.String' to required type 'java.time.Month';")));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void shouldReturnUnauthorizedWhenRequestIsAnonymous() throws Exception {
+        mockMvc.perform(get(TRAINER_WORKLOADS_ENDPOINT + "/{username}", USERNAME)
+                        .param("year", "2025")
+                        .param("month", JULY.name()))
+                .andExpect(status().isUnauthorized());
     }
 
     private TrainerWorkloadUpdateRequest buildRequest(String username) {
