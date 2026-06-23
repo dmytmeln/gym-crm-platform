@@ -18,6 +18,7 @@
 
     <modules>
         <module>api-gateway</module>
+        <module>common</module>
         <module>discovery-server</module>
         <module>gym-core-service</module>
         <module>workload-service</module>

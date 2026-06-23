@@ -2,26 +2,23 @@ package com.gym.crm.workload.exception;
 
 import com.gia.openapi.model.ErrorResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
-import static com.gym.crm.workload.exception.ApiError.AUTHENTICATION_ERROR;
-import static com.gym.crm.workload.exception.ApiError.AUTHORIZATION_ERROR;
 import static com.gym.crm.workload.exception.ApiError.SERVICE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.VALIDATION_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 class GlobalExceptionHandlerTest {
 
@@ -60,10 +57,14 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandleExceptionInternalWithBadRequestStatus() {
-        Exception exception = new Exception("Bad request message");
+    void shouldHandleMissingServletRequestParameter() {
+        MissingServletRequestParameterException exception = new MissingServletRequestParameterException("year", "Integer");
 
-        ResponseEntity<Object> result = handler.handleExceptionInternal(exception, null, new HttpHeaders(), BAD_REQUEST, mock(WebRequest.class));
+        ResponseEntity<Object> result = handler.handleMissingServletRequestParameter(
+                exception,
+                new HttpHeaders(),
+                BAD_REQUEST,
+                mock(WebRequest.class));
 
         assertThat(result).isNotNull();
         assertThat(result.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -71,52 +72,24 @@ class GlobalExceptionHandlerTest {
         ErrorResponse body = (ErrorResponse) result.getBody();
         assertThat(body).isNotNull();
         assertThat(body.getErrorCode()).isEqualTo(VALIDATION_ERROR.getCode());
-        assertThat(body.getErrorMessage()).isEqualTo("Bad request message");
+        assertThat(body.getErrorMessage()).isEqualTo(exception.getMessage());
     }
 
     @Test
-    void shouldHandleExceptionInternalWithUnauthorizedStatus() {
-        Exception exception = new Exception("Unauthorized message");
+    void shouldHandleTypeMismatch() {
+        TypeMismatchException exception = mock(TypeMismatchException.class);
 
-        ResponseEntity<Object> result = handler.handleExceptionInternal(exception, null, new HttpHeaders(), UNAUTHORIZED, mock(WebRequest.class));
+        when(exception.getMessage()).thenReturn("Method parameter 'month': Failed to convert value");
+
+        ResponseEntity<Object> result = handler.handleTypeMismatch(exception, new HttpHeaders(), BAD_REQUEST, mock(WebRequest.class));
 
         assertThat(result).isNotNull();
-        assertThat(result.getStatusCode()).isEqualTo(UNAUTHORIZED);
+        assertThat(result.getStatusCode()).isEqualTo(BAD_REQUEST);
         assertThat(result.getBody()).isInstanceOf(ErrorResponse.class);
         ErrorResponse body = (ErrorResponse) result.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getErrorCode()).isEqualTo(AUTHENTICATION_ERROR.getCode());
-        assertThat(body.getErrorMessage()).isEqualTo("Unauthorized message");
-    }
-
-    @Test
-    void shouldHandleExceptionInternalWithForbiddenStatus() {
-        Exception exception = new Exception("Forbidden message");
-
-        ResponseEntity<Object> result = handler.handleExceptionInternal(exception, null, new HttpHeaders(), FORBIDDEN, mock(WebRequest.class));
-
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode()).isEqualTo(FORBIDDEN);
-        assertThat(result.getBody()).isInstanceOf(ErrorResponse.class);
-        ErrorResponse body = (ErrorResponse) result.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.getErrorCode()).isEqualTo(AUTHORIZATION_ERROR.getCode());
-        assertThat(body.getErrorMessage()).isEqualTo("Forbidden message");
-    }
-
-    @Test
-    void shouldHandleExceptionInternalWithOtherStatus() {
-        Exception exception = new Exception("Internal server error message");
-
-        ResponseEntity<Object> result = handler.handleExceptionInternal(exception, null, new HttpHeaders(), INTERNAL_SERVER_ERROR, mock(WebRequest.class));
-
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
-        assertThat(result.getBody()).isInstanceOf(ErrorResponse.class);
-        ErrorResponse body = (ErrorResponse) result.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.getErrorCode()).isEqualTo(SERVICE_ERROR.getCode());
-        assertThat(body.getErrorMessage()).isEqualTo("Internal server error message");
+        assertThat(body.getErrorCode()).isEqualTo(VALIDATION_ERROR.getCode());
+        assertThat(body.getErrorMessage()).isEqualTo(exception.getMessage());
     }
 
 }

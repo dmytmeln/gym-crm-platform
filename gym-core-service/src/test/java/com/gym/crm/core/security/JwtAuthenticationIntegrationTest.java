@@ -12,6 +12,7 @@ import com.gym.crm.core.config.RedisContainerTestConfig;
 import com.gym.crm.core.config.TestDataset;
 import com.gym.crm.core.entity.User;
 import com.gym.crm.core.repository.UserRepository;
+import com.gym.crm.security.JwtService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

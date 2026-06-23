@@ -1,10 +1,9 @@
-package com.gym.crm.core.security;
+package com.gym.crm.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +17,6 @@ import static io.jsonwebtoken.io.Decoders.BASE64;
 import static java.util.Collections.emptyMap;
 
 @Component
-@Slf4j
 public class JwtService {
 
     private final String secretKey;
@@ -64,7 +62,7 @@ public class JwtService {
         Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
-                .parse(token);
+                .parseClaimsJws(token);
     }
 
     private Claims extractAllClaims(String token) {
