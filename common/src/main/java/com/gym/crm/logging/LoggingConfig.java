@@ -1,7 +1,5 @@
-package com.gym.crm.core.config;
+package com.gym.crm.logging;
 
-import com.gym.crm.logging.RequestLoggingFilter;
-import com.gym.crm.logging.TransactionLoggingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
