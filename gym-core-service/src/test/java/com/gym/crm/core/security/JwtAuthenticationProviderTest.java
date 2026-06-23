@@ -1,5 +1,7 @@
 package com.gym.crm.core.security;
 
+import com.gym.crm.security.JwtPayload;
+import com.gym.crm.security.JwtService;
 import com.gym.crm.core.security.UserDetailsServiceImpl.SimpleUserDetails;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

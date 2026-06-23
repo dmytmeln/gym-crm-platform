@@ -1,5 +1,7 @@
 package com.gym.crm.workload.security;
 
+import com.gym.crm.security.JwtPayload;
+import com.gym.crm.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,5 +1,7 @@
 package com.gym.crm.core.security;
 
+import com.gym.crm.security.JwtPayload;
+import com.gym.crm.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

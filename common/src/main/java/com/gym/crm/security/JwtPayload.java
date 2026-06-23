@@ -1,4 +1,4 @@
-package com.gym.crm.core.security;
+package com.gym.crm.security;
 
 import java.util.Date;
 
