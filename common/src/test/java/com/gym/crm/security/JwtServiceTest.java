@@ -2,6 +2,9 @@ package com.gym.crm.security;
 
 import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,9 +36,11 @@ class JwtServiceTest {
         assertThat(actual.expiration()).isNotNull();
     }
 
-    @Test
-    void shouldRejectMalformedToken() {
-        boolean actual = service.isTokenValid("invalid-token");
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"invalid-token"})
+    void shouldRejectInvalidToken(String token) {
+        boolean actual = service.isTokenValid(token);
 
         assertThat(actual).isFalse();
     }
@@ -65,18 +70,6 @@ class JwtServiceTest {
         assertThrows(JwtException.class, () -> expiredService.getPayload(token));
     }
 
-    @Test
-    void shouldReturnFalseForNullToken() {
-        boolean actual = service.isTokenValid(null);
 
-        assertThat(actual).isFalse();
-    }
-
-    @Test
-    void shouldReturnFalseForEmptyToken() {
-        boolean actual = service.isTokenValid("");
-
-        assertThat(actual).isFalse();
-    }
 
 }
