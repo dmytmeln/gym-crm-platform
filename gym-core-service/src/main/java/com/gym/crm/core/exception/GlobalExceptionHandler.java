@@ -23,6 +23,8 @@ import static com.gym.crm.core.exception.ApiError.DATABASE_ERROR;
 import static com.gym.crm.core.exception.ApiError.IP_BLOCKED_ERROR;
 import static com.gym.crm.core.exception.ApiError.NOT_FOUND_ERROR;
 import static com.gym.crm.core.exception.ApiError.SERVICE_ERROR;
+import static com.gym.crm.core.exception.ApiError.SERVICE_TIMEOUT_ERROR;
+import static com.gym.crm.core.exception.ApiError.SERVICE_UNAVAILABLE_ERROR;
 import static com.gym.crm.core.exception.ApiError.USER_DEACTIVATED_ERROR;
 import static com.gym.crm.core.exception.ApiError.VALIDATION_ERROR;
 import static java.lang.String.format;
@@ -58,6 +60,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         log.warn("Conflict error: {}", ex.getMessage());
         return buildResponse(CONFLICT_ERROR, message);
+    }
+
+    @ExceptionHandler(DownstreamTimeoutException.class)
+    public ResponseEntity<ErrorResponse> handleDownstreamTimeoutException(DownstreamTimeoutException ex) {
+        log.warn("Downstream timeout: {}", ex.getMessage());
+        return buildResponse(SERVICE_TIMEOUT_ERROR, ex.getMessage());
+    }
+
+    @ExceptionHandler({DownstreamConnectionException.class, DownstreamServiceUnavailableException.class})
+    public ResponseEntity<ErrorResponse> handleDownstreamServiceException(ServiceException ex) {
+        log.warn("Downstream service error: {}", ex.getMessage());
+        return buildResponse(SERVICE_UNAVAILABLE_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(UserDeactivatedException.class)
@@ -129,7 +143,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                              @NonNull HttpStatusCode statusCode,
                                                              @NonNull WebRequest request) {
         ApiError apiError = getApiErrorForStatus(statusCode);
-        ErrorResponse errorResponse = new ErrorResponse(apiError.getCode(), ex.getMessage());
+        String message = statusCode.is5xxServerError() ? apiError.getMessage() : ex.getMessage();
+        ErrorResponse errorResponse = new ErrorResponse(apiError.getCode(), message);
 
         log.warn("Spring MVC exception occurred: {}", ex.getMessage());
         return ResponseEntity.status(statusCode).headers(headers).body(errorResponse);

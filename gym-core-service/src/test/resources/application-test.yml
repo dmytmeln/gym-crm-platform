@@ -38,6 +38,7 @@ app:
     workload:
       port: 8081
       url: http://localhost:${app.services.workload.port}/gym-crm/workload/api/v1
+      timeout-seconds: 3
 
 logging:
   level:

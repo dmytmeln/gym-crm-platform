@@ -82,8 +82,13 @@ class RequestLoggingFilterTest {
         request.setContentType("application/json");
         String sensitiveJson = "{\"username\":\"john.doe\",\"password\":\"secret123\"}";
         request.setContent(sensitiveJson.getBytes(UTF_8));
+        FilterChain filterChain = (req, res) -> {
+            req.getInputStream().readAllBytes();
+            res.setContentType("application/json");
+            res.getOutputStream().write("{\"message\":\"ok\"}".getBytes(UTF_8));
+        };
 
-        filter.doFilter(request, response, READING_BODY_FILTER_CHAIN);
+        filter.doFilter(request, response, filterChain);
 
         assertThat(listAppender.list)
                 .extracting(ILoggingEvent::getFormattedMessage)
@@ -94,7 +99,8 @@ class RequestLoggingFilterTest {
         assertThat(listAppender.list)
                 .filteredOn(event -> event.getLevel() == Level.DEBUG)
                 .extracting(ILoggingEvent::getFormattedMessage)
-                .contains("Request body: {\"username\":\"john.doe\",\"password\":\"***\"}");
+                .contains("Request body: {\"username\":\"john.doe\",\"password\":\"***\"}",
+                        "Response body: {\"message\":\"ok\"}");
     }
 
     @Test
@@ -149,6 +155,31 @@ class RequestLoggingFilterTest {
         assertThat(listAppender.list)
                 .extracting(ILoggingEvent::getFormattedMessage)
                 .anyMatch(msg -> msg.startsWith("Request completed: method=GET, uri=/api/v1/error, status=200, durationMs="));
+    }
+
+    @Test
+    void shouldLogSanitizedJsonResponseBodyForErrorResponse() throws ServletException, IOException {
+        request.setMethod("POST");
+        request.setRequestURI("/api/v1/auth/login");
+        request.setContentType("application/json");
+        request.setContent("{\"username\":\"john.doe\"}".getBytes(UTF_8));
+        FilterChain filterChain = (req, res) -> {
+            req.getInputStream().readAllBytes();
+            response.setStatus(400);
+            res.setContentType("application/json");
+            res.getOutputStream().write("{\"errorMessage\":\"bad credentials\",\"password\":\"secret123\"}"
+                    .getBytes(UTF_8));
+        };
+
+        filter.doFilter(request, response, filterChain);
+
+        assertThat(listAppender.list)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .anyMatch(msg -> msg.startsWith("Request completed: method=POST, uri=/api/v1/auth/login, status=400, durationMs="));
+        assertThat(listAppender.list)
+                .filteredOn(event -> event.getLevel() == Level.DEBUG)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .contains("Response body: {\"errorMessage\":\"bad credentials\",\"password\":\"***\"}");
     }
 
 }

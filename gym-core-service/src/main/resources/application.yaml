@@ -57,3 +57,4 @@ app:
   services:
     workload:
       url: http://workload-service/gym-crm/workload/api/v1
+      timeout-seconds: 3
