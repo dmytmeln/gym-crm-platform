@@ -40,7 +40,6 @@ public class ClientConfig {
                                          @Value("${app.services.workload.url}") String workloadUrl,
                                          TokenPropagationInterceptor tokenPropagationInterceptor,
                                          @Value("${app.services.workload.timeout-seconds:3}") int timeoutSeconds,
-                                         JdkClientHttpRequestFactory requestFactory = buildRequestFactory(timeoutSeconds);
                                          TransactionIdPropagationInterceptor transactionIdPropagationInterceptor) {
         JdkClientHttpRequestFactory requestFactory = buildRequestFactory(timeoutSeconds);
         RestClient restClient = restClientBuilder
