@@ -9,6 +9,7 @@ import io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBr
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
@@ -16,7 +17,6 @@ import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConf
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -32,6 +32,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.gym.crm.logging.TransactionContext.TRANSACTION_HEADER;
+import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @SpringBootTest(classes = {ClientConfig.class, WorkloadClientFacade.class, TokenPropagationInterceptor.class}, properties = "app.services.workload.port=${wiremock.server.port}")
@@ -44,10 +46,11 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 })
 @ActiveProfiles("test")
 @EnableWireMock
-class ClientTokenPropagationTest {
+class ClientPropagationTest {
 
     private static final String WORKLOAD_ENDPOINT = "/gym-crm/workload/api/v1/trainer-workloads";
     private static final String BEARER_TOKEN = "Bearer test-jwt-token";
+    private static final String TRANSACTION_ID_VALUE = "valid-tx-12345";
 
     @Autowired
     private WorkloadClientFacade facade;
@@ -58,15 +61,19 @@ class ClientTokenPropagationTest {
         incomingRequest.addHeader(AUTHORIZATION, BEARER_TOKEN);
 
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(incomingRequest));
+
+        MDC.put(TRANSACTION_ID, TRANSACTION_ID_VALUE);
     }
 
     @AfterEach
     void tearDown() {
         RequestContextHolder.resetRequestAttributes();
+
+        MDC.clear();
     }
 
     @Test
-    void shouldPropagateAuthorizationHeaderWhenRequestContextIsPresent() {
+    void shouldPropagateAuthorizationAndTransactionHeadersWhenContextIsPresent() {
         Training training = buildTestTraining();
 
         stubFor(post(urlEqualTo(WORKLOAD_ENDPOINT))
@@ -76,7 +83,8 @@ class ClientTokenPropagationTest {
         facade.addWorkload(training);
 
         verify(postRequestedFor(urlEqualTo(WORKLOAD_ENDPOINT))
-                .withHeader(AUTHORIZATION, equalTo(BEARER_TOKEN)));
+                .withHeader(AUTHORIZATION, equalTo(BEARER_TOKEN))
+                .withHeader(TRANSACTION_HEADER, equalTo(TRANSACTION_ID_VALUE)));
     }
 
     private Training buildTestTraining() {

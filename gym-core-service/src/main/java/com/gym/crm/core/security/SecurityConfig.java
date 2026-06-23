@@ -28,6 +28,7 @@ import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import static com.gym.crm.logging.TransactionContext.TRANSACTION_HEADER;
 
 @Configuration
 @Import(JwtService.class)
@@ -80,8 +81,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of(GET.name(), POST.name(), PUT.name(), PATCH.name(), DELETE.name(), OPTIONS.name()));
-        configuration.setAllowedHeaders(List.of(AUTHORIZATION, CONTENT_TYPE));
-        configuration.setExposedHeaders(List.of(AUTHORIZATION));
+        configuration.setAllowedHeaders(List.of(AUTHORIZATION, CONTENT_TYPE, TRANSACTION_HEADER));
+        configuration.setExposedHeaders(List.of(AUTHORIZATION, TRANSACTION_HEADER));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

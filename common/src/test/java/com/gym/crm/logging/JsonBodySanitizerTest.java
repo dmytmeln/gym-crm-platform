@@ -1,4 +1,4 @@
-package com.gym.crm.core.logging;
+package com.gym.crm.logging;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -96,22 +96,16 @@ class JsonBodySanitizerTest {
 
     private static Stream<Arguments> provideSanitizeTestData() {
         return Stream.of(
-                Arguments.of("Hello, World!",
-                        "Hello, World!"),
+                Arguments.of("Hello, World!", "Hello, World!"),
                 Arguments.of("{\"password\": \"secret123\", \"oldpassword\": \"old123\", \"newpassword\": \"new123\"}",
                         "{\"password\":\"***\",\"oldpassword\":\"***\",\"newpassword\":\"***\"}"),
                 Arguments.of("{\"Password\": \"secret123\", \"OLDpassword\": \"old123\", \"NewPassword\": \"new123\"}",
                         "{\"Password\":\"***\",\"OLDpassword\":\"***\",\"NewPassword\":\"***\"}"),
-                Arguments.of("{\"password\": null}",
-                        "{\"password\":null}"),
-                Arguments.of("{\"address\": \"123\"}",
-                        "{\"address\":\"***\"}"),
-                Arguments.of("{\"address\": \"12345678\"}",
-                        "{\"address\":\"12***\"}"),
-                Arguments.of("{\"address\": 12345}",
-                        "{\"address\":12345}"),
-                Arguments.of("{\"address\": null}",
-                        "{\"address\":null}"),
+                Arguments.of("{\"password\": null}", "{\"password\":null}"),
+                Arguments.of("{\"address\": \"123\"}", "{\"address\":\"***\"}"),
+                Arguments.of("{\"address\": \"12345678\"}", "{\"address\":\"12***\"}"),
+                Arguments.of("{\"address\": 12345}", "{\"address\":12345}"),
+                Arguments.of("{\"address\": null}", "{\"address\":null}"),
                 Arguments.of("{\"user\": {\"password\": \"secret\"}, \"items\": [{\"address\": \"12345678\"}]}",
                         "{\"user\":{\"password\":\"***\"},\"items\":[{\"address\":\"12***\"}]}")
         );
