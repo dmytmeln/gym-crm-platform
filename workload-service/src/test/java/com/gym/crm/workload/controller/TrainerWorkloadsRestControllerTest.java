@@ -3,6 +3,8 @@ package com.gym.crm.workload.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gia.openapi.model.TrainerWorkloadUpdateRequest;
 import com.gia.openapi.model.TrainerWorkloadUpdateRequest.ActionTypeEnum;
+import com.gym.crm.logging.LoggingConfig;
+import com.gym.crm.logging.TransactionContext;
 import com.gym.crm.workload.dto.ActionType;
 import com.gym.crm.workload.dto.TrainerWorkloadUpdate;
 import com.gym.crm.workload.dto.TrainingDate;
@@ -29,13 +31,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TrainerWorkloadsRestController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, LoggingConfig.class})
 @WithMockUser
 class TrainerWorkloadsRestControllerTest {
 
@@ -126,6 +129,31 @@ class TrainerWorkloadsRestControllerTest {
                         .param("year", "2025")
                         .param("month", JULY.name()))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldPropagateIncomingTransactionIdToResponse() throws Exception {
+        String transactionId = "valid-tx-12345";
+
+        when(service.getWorkingHours(any(TrainerWorkloadSearchFilter.class))).thenReturn(120);
+
+        mockMvc.perform(get(TRAINER_WORKLOADS_ENDPOINT + "/{username}", USERNAME)
+                        .param("year", "2025")
+                        .param("month", JULY.name())
+                        .header(TransactionContext.TRANSACTION_HEADER, transactionId))
+                .andExpect(status().isOk())
+                .andExpect(header().string(TransactionContext.TRANSACTION_HEADER, transactionId));
+    }
+
+    @Test
+    void shouldGenerateTransactionIdWhenRequestHeaderMissing() throws Exception {
+        when(service.getWorkingHours(any(TrainerWorkloadSearchFilter.class))).thenReturn(120);
+
+        mockMvc.perform(get(TRAINER_WORKLOADS_ENDPOINT + "/{username}", USERNAME)
+                        .param("year", "2025")
+                        .param("month", JULY.name()))
+                .andExpect(status().isOk())
+                .andExpect(header().exists(TransactionContext.TRANSACTION_HEADER));
     }
 
     private TrainerWorkloadUpdateRequest buildRequest(String username) {

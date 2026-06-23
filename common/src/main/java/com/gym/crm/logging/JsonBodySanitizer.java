@@ -1,4 +1,4 @@
-package com.gym.crm.core.logging;
+package com.gym.crm.logging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

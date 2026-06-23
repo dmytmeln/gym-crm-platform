@@ -1,4 +1,4 @@
-package com.gym.crm.core.logging;
+package com.gym.crm.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -14,8 +14,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -80,7 +81,7 @@ class RequestLoggingFilterTest {
         request.setRequestURI("/api/v1/auth/login");
         request.setContentType("application/json");
         String sensitiveJson = "{\"username\":\"john.doe\",\"password\":\"secret123\"}";
-        request.setContent(sensitiveJson.getBytes(StandardCharsets.UTF_8));
+        request.setContent(sensitiveJson.getBytes(UTF_8));
 
         filter.doFilter(request, response, READING_BODY_FILTER_CHAIN);
 
@@ -101,9 +102,9 @@ class RequestLoggingFilterTest {
         request.setMethod("POST");
         request.setRequestURI("/api/v1/trainers");
         request.setContentType("application/json");
-        request.setCharacterEncoding(StandardCharsets.UTF_16.name());
+        request.setCharacterEncoding(UTF_16.name());
         String bodyText = "{\"name\":\"Alice\",\"address\":\"12345\"}";
-        request.setContent(bodyText.getBytes(StandardCharsets.UTF_16));
+        request.setContent(bodyText.getBytes(UTF_16));
 
         filter.doFilter(request, response, READING_BODY_FILTER_CHAIN);
 
@@ -120,7 +121,7 @@ class RequestLoggingFilterTest {
         request.setContentType("application/json");
         request.setCharacterEncoding("invalid-charset-name");
         String bodyText = "{\"name\":\"Bob\"}";
-        request.setContent(bodyText.getBytes(StandardCharsets.UTF_8));
+        request.setContent(bodyText.getBytes(UTF_8));
 
         filter.doFilter(request, response, READING_BODY_FILTER_CHAIN);
 

@@ -1,5 +1,6 @@
 package com.gym.crm.core.config;
 
+import com.gym.crm.client.TransactionIdPropagationInterceptor;
 import com.gym.crm.core.client.WorkloadClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,13 +34,20 @@ public class ClientConfig {
     @Bean
     public WorkloadClient workloadClient(@Qualifier("loadBalancedRestClientBuilder") RestClient.Builder restClientBuilder,
                                          @Value("${app.services.workload.url}") String workloadUrl,
-                                         TokenPropagationInterceptor tokenPropagationInterceptor) {
+                                         TokenPropagationInterceptor tokenPropagationInterceptor,
+                                         TransactionIdPropagationInterceptor transactionIdPropagationInterceptor) {
         RestClient restClient = restClientBuilder
                 .baseUrl(workloadUrl)
                 .requestInterceptor(tokenPropagationInterceptor)
+                .requestInterceptor(transactionIdPropagationInterceptor)
                 .build();
 
         return createClient(restClient, WorkloadClient.class);
+    }
+
+    @Bean
+    public TransactionIdPropagationInterceptor transactionIdPropagationInterceptor() {
+        return new TransactionIdPropagationInterceptor();
     }
 
     private <T> T createClient(RestClient restClient, Class<T> clientClass) {
