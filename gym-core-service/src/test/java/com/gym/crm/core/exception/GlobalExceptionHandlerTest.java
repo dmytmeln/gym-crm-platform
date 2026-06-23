@@ -21,6 +21,8 @@ import static com.gym.crm.core.exception.ApiError.DATABASE_ERROR;
 import static com.gym.crm.core.exception.ApiError.IP_BLOCKED_ERROR;
 import static com.gym.crm.core.exception.ApiError.NOT_FOUND_ERROR;
 import static com.gym.crm.core.exception.ApiError.SERVICE_ERROR;
+import static com.gym.crm.core.exception.ApiError.SERVICE_TIMEOUT_ERROR;
+import static com.gym.crm.core.exception.ApiError.SERVICE_UNAVAILABLE_ERROR;
 import static com.gym.crm.core.exception.ApiError.USER_DEACTIVATED_ERROR;
 import static com.gym.crm.core.exception.ApiError.VALIDATION_ERROR;
 import static java.lang.String.format;
@@ -112,7 +114,7 @@ class GlobalExceptionHandlerTest {
         ErrorResponse body = (ErrorResponse) result.getBody();
         assertThat(body).isNotNull();
         assertThat(body.getErrorCode()).isEqualTo(SERVICE_ERROR.getCode());
-        assertThat(body.getErrorMessage()).isEqualTo("Internal server error message");
+        assertThat(body.getErrorMessage()).isEqualTo(SERVICE_ERROR.getMessage());
     }
 
     @Test
@@ -243,6 +245,30 @@ class GlobalExceptionHandlerTest {
         assertThat(result.getBody()).isNotNull();
         assertThat(result.getBody().getErrorCode()).isEqualTo(CONFLICT_ERROR.getCode());
         assertThat(result.getBody().getErrorMessage()).isEqualTo(buildExpectedErrorMessage(CONFLICT_ERROR, exception));
+    }
+
+    @Test
+    void shouldHandleDownstreamTimeoutException() {
+        DownstreamTimeoutException exception = new DownstreamTimeoutException("workload-service", 3, new RuntimeException("timeout"));
+
+        ResponseEntity<ErrorResponse> result = handler.handleDownstreamTimeoutException(exception);
+
+        assertThat(result.getStatusCode()).isEqualTo(SERVICE_TIMEOUT_ERROR.getStatus());
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getErrorCode()).isEqualTo(SERVICE_TIMEOUT_ERROR.getCode());
+        assertThat(result.getBody().getErrorMessage()).isEqualTo("Timeout: workload-service did not respond within 3s");
+    }
+
+    @Test
+    void shouldHandleDownstreamConnectionException() {
+        DownstreamConnectionException exception = new DownstreamConnectionException("workload-service", new RuntimeException("connect"));
+
+        ResponseEntity<ErrorResponse> result = handler.handleDownstreamServiceException(exception);
+
+        assertThat(result.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE_ERROR.getStatus());
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getErrorCode()).isEqualTo(SERVICE_UNAVAILABLE_ERROR.getCode());
+        assertThat(result.getBody().getErrorMessage()).isEqualTo("Connection error: Cannot connect to workload-service");
     }
 
     @Test

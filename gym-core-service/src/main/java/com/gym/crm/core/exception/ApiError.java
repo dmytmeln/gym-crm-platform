@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -21,6 +23,8 @@ public enum ApiError {
     IP_BLOCKED_ERROR(2808, "IP is temporarily blocked due to too many failed login attempts", TOO_MANY_REQUESTS),
     NOT_FOUND_ERROR(2835, "Requested data was not found", NOT_FOUND),
     CONFLICT_ERROR(2809, "Conflict error", CONFLICT),
+    SERVICE_UNAVAILABLE_ERROR(3201, "Downstream service is unavailable", SERVICE_UNAVAILABLE),
+    SERVICE_TIMEOUT_ERROR(3202, "Downstream service timeout", GATEWAY_TIMEOUT),
     SERVICE_ERROR(3200, "Internal processing error", INTERNAL_SERVER_ERROR),
     DATABASE_ERROR(3358, "Database error", INTERNAL_SERVER_ERROR);
 

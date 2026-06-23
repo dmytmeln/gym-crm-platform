@@ -1,6 +1,8 @@
 package com.gym.crm.core.controller;
 
 import com.gia.openapi.model.ErrorResponse;
+import com.gym.crm.core.exception.DownstreamConnectionException;
+import com.gym.crm.core.exception.DownstreamTimeoutException;
 import com.gia.openapi.model.TrainingCreateRequest;
 import com.gia.openapi.model.TrainingTypeResponse;
 import com.gym.crm.core.exception.EntityNotFoundException;
@@ -19,6 +21,8 @@ import static com.gym.crm.core.exception.ApiError.AUTHENTICATION_ERROR;
 import static com.gym.crm.core.exception.ApiError.DATABASE_ERROR;
 import static com.gym.crm.core.exception.ApiError.NOT_FOUND_ERROR;
 import static com.gym.crm.core.exception.ApiError.SERVICE_ERROR;
+import static com.gym.crm.core.exception.ApiError.SERVICE_TIMEOUT_ERROR;
+import static com.gym.crm.core.exception.ApiError.SERVICE_UNAVAILABLE_ERROR;
 import static com.gym.crm.core.exception.ApiError.VALIDATION_ERROR;
 import static com.gym.crm.core.helper.JsonUtil.readJson;
 import static java.time.Month.JULY;
@@ -219,6 +223,46 @@ class TrainingRestControllerTest extends AbstractRestControllerTest {
         ErrorResponse actualErrorResponse = objectMapper.readValue(actualResponseBody, ErrorResponse.class);
         assertThat(actualErrorResponse.getErrorCode()).isEqualTo(DATABASE_ERROR.getCode());
         assertThat(actualErrorResponse.getErrorMessage()).isEqualTo(DATABASE_ERROR.getMessage());
+    }
+
+    @Test
+    void shouldReturn504WhenWorkloadServiceTimesOutOnAddTraining() throws Exception {
+        TrainingCreateRequest validRequest = buildTrainingCreateRequest(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_DATE, TRAINING_DURATION);
+        DownstreamTimeoutException exception = new DownstreamTimeoutException("workload-service", 3, new RuntimeException("timeout"));
+
+        doThrow(exception).when(facade).createTraining(validRequest);
+
+        String actualResponseBody = mockMvc.perform(post(TRAININGS_ENDPOINT)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequest)))
+                .andExpect(status().isGatewayTimeout())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ErrorResponse actualErrorResponse = objectMapper.readValue(actualResponseBody, ErrorResponse.class);
+        assertThat(actualErrorResponse.getErrorCode()).isEqualTo(SERVICE_TIMEOUT_ERROR.getCode());
+        assertThat(actualErrorResponse.getErrorMessage()).isEqualTo("Timeout: workload-service did not respond within 3s");
+    }
+
+    @Test
+    void shouldReturn503WhenWorkloadServiceConnectionFailsOnAddTraining() throws Exception {
+        TrainingCreateRequest validRequest = buildTrainingCreateRequest(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_DATE, TRAINING_DURATION);
+        DownstreamConnectionException exception = new DownstreamConnectionException("workload-service", new RuntimeException("connect"));
+
+        doThrow(exception).when(facade).createTraining(validRequest);
+
+        String actualResponseBody = mockMvc.perform(post(TRAININGS_ENDPOINT)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequest)))
+                .andExpect(status().isServiceUnavailable())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ErrorResponse actualErrorResponse = objectMapper.readValue(actualResponseBody, ErrorResponse.class);
+        assertThat(actualErrorResponse.getErrorCode()).isEqualTo(SERVICE_UNAVAILABLE_ERROR.getCode());
+        assertThat(actualErrorResponse.getErrorMessage()).isEqualTo("Connection error: Cannot connect to workload-service");
     }
 
     @Test

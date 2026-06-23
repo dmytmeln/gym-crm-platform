@@ -4,6 +4,7 @@ import com.gym.crm.core.config.ClientConfig;
 import com.gym.crm.core.entity.Trainer;
 import com.gym.crm.core.entity.Training;
 import com.gym.crm.core.entity.User;
+import com.gym.crm.core.exception.DownstreamServiceUnavailableException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -25,7 +26,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gym.crm.core.security.TokenPropagationInterceptor;
 
@@ -95,14 +96,14 @@ class WorkloadClientIntegrationTest {
     }
 
     @Test
-    void shouldNotPropagateExceptionWhenWorkloadServiceReturnsError() {
+    void shouldThrowServiceUnavailableExceptionWhenWorkloadServiceReturnsServerError() {
         Training training = buildTestTraining();
 
         stubFor(post(urlEqualTo(WORKLOAD_ENDPOINT))
                 .willReturn(aResponse()
                         .withStatus(500)));
 
-        assertDoesNotThrow(() -> facade.addWorkload(training));
+        assertThrows(DownstreamServiceUnavailableException.class, () -> facade.addWorkload(training));
     }
 
     private Training buildTestTraining() {
