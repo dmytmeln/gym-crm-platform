@@ -1,32 +1,42 @@
 package com.gym.crm.workload.listener;
 
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
-import com.gym.crm.workload.contract.WorkloadActionType;
 import com.gym.crm.workload.dto.ActionType;
 import com.gym.crm.workload.dto.TrainerWorkloadUpdate;
 import com.gym.crm.workload.dto.TrainingDate;
 import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
+import com.gym.crm.workload.service.TrainerWorkloadDeadLetterQueuePublisher;
+import com.gym.crm.workload.service.TrainerWorkloadMessageValidator;
 import com.gym.crm.workload.service.TrainerWorkloadService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
+import static com.gym.crm.workload.contract.WorkloadActionType.ADD;
 import static java.time.Month.JUNE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrainerWorkloadMessageListenerTest {
 
     private static final String TRANSACTION_ID_VALUE = "tx-workload-987";
+    private static final String VALIDATION_FAILURE_REASON = "username: Username is required";
+    private static final String INVALID_TRANSACTION_ID = "invalid transaction id";
+    private static final String GENERATED_TRANSACTION_ID_PATTERN = "^[a-f0-9\\-]{36}$";
 
     @Mock
     private TrainerWorkloadService service;
@@ -34,29 +44,22 @@ class TrainerWorkloadMessageListenerTest {
     @Mock
     private TrainerWorkloadMapper mapper;
 
+    @Mock
+    private TrainerWorkloadDeadLetterQueuePublisher deadLetterQueuePublisher;
+
+    @Mock
+    private TrainerWorkloadMessageValidator messageValidator;
+
     @InjectMocks
     private TrainerWorkloadMessageListener listener;
 
     @Test
-    void shouldProcessMessageAndPropagateMdc() {
-        TrainerWorkloadUpdateMessage message = TrainerWorkloadUpdateMessage.builder()
-                .username("trainer.user")
-                .firstName("Liam")
-                .lastName("Miller")
-                .isActive(true)
-                .trainingDate(LocalDate.of(2026, JUNE, 28))
-                .trainingDuration(60)
-                .actionType(WorkloadActionType.ADD)
-                .build();
-        TrainerWorkloadUpdate domainUpdate = new TrainerWorkloadUpdate("trainer.user",
-                "Liam",
-                "Miller",
-                true,
-                TrainingDate.of(2026, JUNE),
-                60,
-                ActionType.ADD);
+    void shouldProcessValidMessageAndPropagateMdc() {
+        TrainerWorkloadUpdateMessage message = buildMessage();
+        TrainerWorkloadUpdate domainUpdate = buildDomainUpdate();
 
         when(mapper.toDomainUpdate(message)).thenReturn(domainUpdate);
+        when(messageValidator.validate(message)).thenReturn(Optional.empty());
         doAnswer(invocation -> {
             assertThat(MDC.get(TRANSACTION_ID)).isEqualTo(TRANSACTION_ID_VALUE);
             return null;
@@ -65,6 +68,62 @@ class TrainerWorkloadMessageListenerTest {
         listener.receiveMessage(message, TRANSACTION_ID_VALUE);
 
         verify(service).updateWorkload(domainUpdate);
+        verify(deadLetterQueuePublisher, never()).publish(message, VALIDATION_FAILURE_REASON, TRANSACTION_ID_VALUE);
         assertThat(MDC.get(TRANSACTION_ID)).isNull();
     }
+
+    @Test
+    void shouldSendInvalidMessageToDeadLetterQueueAndSkipBusinessProcessing() {
+        TrainerWorkloadUpdateMessage message = buildMessage();
+
+        when(messageValidator.validate(message)).thenReturn(Optional.of(VALIDATION_FAILURE_REASON));
+
+        listener.receiveMessage(message, TRANSACTION_ID_VALUE);
+
+        verify(deadLetterQueuePublisher).publish(message, VALIDATION_FAILURE_REASON, TRANSACTION_ID_VALUE);
+        verifyNoInteractions(mapper);
+        verifyNoInteractions(service);
+        assertThat(MDC.get(TRANSACTION_ID)).isNull();
+    }
+
+    @Test
+    void shouldResolveTransactionIdBeforePublishingDeadLetterMessage() {
+        TrainerWorkloadUpdateMessage message = buildMessage();
+        ArgumentCaptor<String> transactionIdCaptor = ArgumentCaptor.forClass(String.class);
+
+        when(messageValidator.validate(message)).thenReturn(Optional.of(VALIDATION_FAILURE_REASON));
+
+        listener.receiveMessage(message, INVALID_TRANSACTION_ID);
+
+        verify(deadLetterQueuePublisher).publish(eq(message), eq(VALIDATION_FAILURE_REASON), transactionIdCaptor.capture());
+        assertThat(transactionIdCaptor.getValue())
+                .isNotEqualTo(INVALID_TRANSACTION_ID)
+                .matches(GENERATED_TRANSACTION_ID_PATTERN);
+        verifyNoInteractions(mapper);
+        verifyNoInteractions(service);
+        assertThat(MDC.get(TRANSACTION_ID)).isNull();
+    }
+
+    private TrainerWorkloadUpdateMessage buildMessage() {
+        return TrainerWorkloadUpdateMessage.builder()
+                .username("trainer.user")
+                .firstName("Liam")
+                .lastName("Miller")
+                .isActive(true)
+                .trainingDate(LocalDate.of(2026, JUNE, 28))
+                .trainingDuration(60)
+                .actionType(ADD)
+                .build();
+    }
+
+    private TrainerWorkloadUpdate buildDomainUpdate() {
+        return new TrainerWorkloadUpdate("trainer.user",
+                "Liam",
+                "Miller",
+                true,
+                TrainingDate.of(2026, JUNE),
+                60,
+                ActionType.ADD);
+    }
+
 }
