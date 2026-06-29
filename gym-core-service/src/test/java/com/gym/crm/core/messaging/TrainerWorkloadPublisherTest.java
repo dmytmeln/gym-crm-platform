@@ -20,6 +20,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.LocalDate;
 
 import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
+import static java.time.Month.JUNE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -117,7 +118,7 @@ class TrainerWorkloadPublisherTest {
 
         return Training.builder()
                 .trainer(trainer)
-                .trainingDate(LocalDate.of(2026, 6, 17))
+                .trainingDate(LocalDate.of(2026, JUNE, 17))
                 .trainingDuration(60)
                 .build();
     }

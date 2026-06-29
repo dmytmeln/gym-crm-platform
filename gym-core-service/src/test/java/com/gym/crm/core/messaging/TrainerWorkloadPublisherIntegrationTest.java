@@ -57,6 +57,7 @@ class TrainerWorkloadPublisherIntegrationTest {
 
         jmsTemplate.setReceiveTimeout(50);
         while (jmsTemplate.receive(queueName) != null) {
+            // clear queue
         }
 
         jmsTemplate.setReceiveTimeout(RECEIVE_TIMEOUT);
