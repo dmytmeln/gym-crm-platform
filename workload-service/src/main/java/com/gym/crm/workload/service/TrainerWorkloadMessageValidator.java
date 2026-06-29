@@ -28,11 +28,20 @@ public class TrainerWorkloadMessageValidator {
             return Optional.empty();
         }
 
-        return Optional.of(constraintViolations.stream()
+        String formattedViolations = constraintViolations.stream()
+                .filter(violation -> violation.getPropertyPath() != null && violation.getMessage() != null)
                 .sorted(comparing(violation -> violation.getPropertyPath().toString()))
-                .map(constraintViolation -> VIOLATION_MESSAGE_FORMAT.formatted(constraintViolation.getPropertyPath(),
-                        constraintViolation.getMessage()))
-                .collect(joining(VIOLATION_DELIMITER)));
+                .map(this::formatViolation)
+                .collect(joining(VIOLATION_DELIMITER));
+
+        return Optional.of(formattedViolations);
+    }
+
+    private String formatViolation(ConstraintViolation<TrainerWorkloadUpdateMessage> violation) {
+        String path = violation.getPropertyPath().toString();
+        String message = violation.getMessage();
+
+        return VIOLATION_MESSAGE_FORMAT.formatted(path, message);
     }
 
 }
