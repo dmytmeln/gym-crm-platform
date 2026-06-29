@@ -11,6 +11,10 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST}
+  activemq:
+    broker-url: ${ACTIVEMQ_BROKER_URL}
+    user: ${ACTIVEMQ_USER}
+    password: ${ACTIVEMQ_PASSWORD}
 
 eureka:
   client:

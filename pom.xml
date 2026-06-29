@@ -22,6 +22,7 @@
         <module>discovery-server</module>
         <module>gym-core-service</module>
         <module>workload-service</module>
+        <module>workload-contract</module>
     </modules>
 
     <properties>
@@ -40,7 +41,8 @@
         <sonar.projectKey>dmytmeln_gym-crm-platform</sonar.projectKey>
         <sonar.organization>dmytmeln</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>

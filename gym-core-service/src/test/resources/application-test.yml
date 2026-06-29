@@ -22,6 +22,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+  activemq:
+    broker-url: failover:(vm://localhost?broker.persistent=false)
 
 eureka:
   client:
@@ -34,11 +36,9 @@ app:
       access-expiration-ms: 86400000
     cors:
       allowed-origins: https://editor.swagger.io/
-  services:
-    workload:
-      port: 8081
-      url: http://localhost:${app.services.workload.port}/gym-crm/workload/api/v1
-      timeout-seconds: 3
+  jms:
+    queues:
+      trainer-workload: trainer.workload.updates
 
 logging:
   level:

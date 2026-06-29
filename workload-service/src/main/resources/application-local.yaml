@@ -1,3 +1,9 @@
+spring:
+  activemq:
+    broker-url: failover:(tcp://localhost:61616)
+    user: gym
+    password: gym
+
 eureka:
   client:
     service-url:
@@ -7,3 +13,9 @@ app:
   security:
     jwt:
       secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.gym.crm: DEBUG
