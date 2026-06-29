@@ -35,3 +35,10 @@ app:
   jms:
     queues:
       trainer-workload: trainer.workload.updates
+      trainer-workload-dlq: trainer.workload.updates.dlq
+    redelivery:
+      initial-delay-ms: 1000
+      maximum-redeliveries: 3
+      maximum-delay-ms: 10000
+      back-off-multiplier: 2.0
+      use-exponential-back-off: true
