@@ -1,4 +1,4 @@
-package com.gym.crm.workload.config;
+package com.gym.crm.jms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
