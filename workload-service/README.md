@@ -2,13 +2,32 @@
 
 This microservice handles managing and tracking trainer workloads.
 
+## Prerequisites
+
+In addition to the global prerequisites, you will need:
+* ActiveMQ broker or Docker
+
 ## Setup and Running
 
-### Run the Application
+### Step 1: Set Up ActiveMQ
+
+This service consumes trainer workload update messages from ActiveMQ. Follow the shared broker setup in the [root README](../README.md#step-3-start-shared-infrastructure).
+
+Local profile defaults to:
+
+* **Broker URL**: `failover:(tcp://localhost:61616)`
+* **Username**: `gym`
+* **Password**: `gym`
+
+If your broker credentials differ from the local profile defaults above, override service credentials at startup via
+`SPRING_ACTIVEMQ_USER` / `SPRING_ACTIVEMQ_PASSWORD` or equivalent Spring Boot arguments or change ActiveMQ admin user and admin password.
+
+### Step 2: Run the Application
 
 > [!IMPORTANT]
 > The following service must be running for this service to register and function correctly:
 > * **[Discovery Server](../discovery-server/README.md)**: Service registry required for Eureka registration.
+> * **ActiveMQ broker**: Required for JMS message consumption.
 
 You can run the workload service using Maven from the service directory or from the root:
 

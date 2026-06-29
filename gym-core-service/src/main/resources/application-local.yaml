@@ -11,6 +11,10 @@ spring:
   data:
     redis:
       host: localhost
+  activemq:
+    broker-url: failover:(tcp://localhost:61616)
+    user: gym
+    password: gym
 
 eureka:
   client:

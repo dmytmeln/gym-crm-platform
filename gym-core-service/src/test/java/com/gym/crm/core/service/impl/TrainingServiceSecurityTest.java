@@ -1,11 +1,11 @@
 package com.gym.crm.core.service.impl;
 
-import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
 import com.gym.crm.core.entity.Training;
 import com.gym.crm.core.entity.TrainingType;
 import com.gym.crm.core.entity.User;
+import com.gym.crm.core.messaging.TrainerWorkloadPublisher;
 import com.gym.crm.core.repository.TraineeRepository;
 import com.gym.crm.core.repository.TrainerRepository;
 import com.gym.crm.core.repository.TrainingRepository;
@@ -45,7 +45,7 @@ class TrainingServiceSecurityTest {
     private TrainingTypeRepository trainingTypeRepository;
 
     @MockitoBean
-    private WorkloadClientFacade workloadClientFacade;
+    private TrainerWorkloadPublisher trainerWorkloadPublisher;
 
     @Autowired
     private TrainingService service;

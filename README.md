@@ -16,7 +16,7 @@
 * Git (2.40+)
 * JDK 21
 * Apache Maven (3.8+)
-* Docker (Required for running integration tests via Testcontainers, or optionally for running MySQL and Redis)
+* Docker (Required for running integration tests via Testcontainers, or optionally for running MySQL, Redis, and ActiveMQ)
 
 ## Quick Start Guide
 
@@ -41,7 +41,28 @@ To build and run all tests for all modules (requires Docker to be running):
 mvn clean install
 ```
 
-### Step 3: Run the Services
+### Step 3: Start Shared Infrastructure
+
+For local development, both `gym-core-service` and `workload-service` require an ActiveMQ broker.
+
+Local profiles in both services default to:
+
+* **Broker URL**: `failover:(tcp://localhost:61616)`
+* **Username**: `gym`
+* **Password**: `gym`
+
+The `rmohr/activemq` Docker Hub overview documents running the image as:
+
+```bash
+docker run --name gym-activemq -p 61616:61616 -p 8161:8161 -d rmohr/activemq
+```
+
+Optional web console: [http://localhost:8161](http://localhost:8161)
+
+If your broker credentials differ from the local profile defaults above, override service credentials at startup via
+`SPRING_ACTIVEMQ_USER` / `SPRING_ACTIVEMQ_PASSWORD` or equivalent Spring Boot arguments or change ActiveMQ admin user and admin password.
+
+### Step 4: Run the Services
 
 For a fully functional platform, the services should be started in the following order:
 
@@ -50,7 +71,7 @@ For a fully functional platform, the services should be started in the following
 3. **[Workload Service Setup & Run](workload-service/README.md)** (Port `8081`)
 4. **[Gym Core Service Setup & Run](gym-core-service/README.md)** (Port `8082`)
 
-Please refer to individual service documentation for specific setup and configuration requirements.
+Please refer to individual service documentation for service-specific setup and configuration requirements.
 
 ---
 

@@ -5,13 +5,13 @@ import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
 import com.gym.crm.core.entity.Training;
 import com.gym.crm.core.entity.User;
+import com.gym.crm.core.messaging.TrainerWorkloadPublisher;
 import com.gym.crm.core.repository.TraineeRepository;
 import com.gym.crm.core.repository.TrainerRepository;
 import com.gym.crm.core.repository.TrainingRepository;
 import com.gym.crm.core.repository.specification.TraineeTrainingCriteriaBuilder;
 import com.gym.crm.core.service.TraineeService;
 import com.gym.crm.core.service.common.ProfileCredentialGenerator;
-import com.gym.crm.core.client.WorkloadClientFacade;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -53,7 +53,7 @@ class TraineeServiceSecurityTest {
     private TraineeTrainingCriteriaBuilder trainingCriteriaBuilder;
 
     @MockitoBean
-    private WorkloadClientFacade workloadClientFacade;
+    private TrainerWorkloadPublisher trainerWorkloadPublisher;
 
     @Autowired
     private TraineeService service;

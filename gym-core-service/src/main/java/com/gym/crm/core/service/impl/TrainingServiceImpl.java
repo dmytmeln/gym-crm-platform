@@ -1,11 +1,11 @@
 package com.gym.crm.core.service.impl;
 
-import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
 import com.gym.crm.core.entity.Training;
 import com.gym.crm.core.entity.TrainingType;
 import com.gym.crm.core.exception.EntityNotFoundException;
+import com.gym.crm.core.messaging.TrainerWorkloadPublisher;
 import com.gym.crm.core.repository.TraineeRepository;
 import com.gym.crm.core.repository.TrainerRepository;
 import com.gym.crm.core.repository.TrainingRepository;
@@ -33,7 +33,7 @@ public class TrainingServiceImpl implements TrainingService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingTypeRepository trainingTypeRepository;
-    private final WorkloadClientFacade workloadClientFacade;
+    private final TrainerWorkloadPublisher trainerWorkloadPublisher;
 
     @Override
     @Transactional
@@ -63,7 +63,7 @@ public class TrainingServiceImpl implements TrainingService {
         log.info("Training created with ID: {} for trainee ID: {} and trainer ID: {}",
                 createdTraining.getId(), createdTraining.getTrainee().getId(), createdTraining.getTrainer().getId());
 
-        workloadClientFacade.addWorkload(createdTraining);
+        trainerWorkloadPublisher.addWorkload(createdTraining);
 
         return createdTraining;
     }
@@ -95,7 +95,7 @@ public class TrainingServiceImpl implements TrainingService {
         trainingRepository.flush();
         log.info("Training with ID: {} deleted successfully", id);
 
-        workloadClientFacade.deleteWorkload(training);
+        trainerWorkloadPublisher.deleteWorkload(training);
     }
 
 }

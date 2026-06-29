@@ -24,26 +24,17 @@ import com.gym.crm.core.dto.filter.TrainerTrainingSearchFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.web.client.RestClient;
-import org.wiremock.spring.EnableWireMock;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.time.Month.AUGUST;
 import static java.time.Month.JANUARY;
 import static java.time.Month.MAY;
@@ -52,34 +43,33 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(properties = {"app.services.workload.port=${wiremock.server.port}", "spring.main.allow-bean-definition-overriding=true"})
+@SpringBootTest
 @ActiveProfiles("test")
 @TestDataset
-@EnableWireMock
 class GymFacadeIntegrationTest {
 
-    @TestConfiguration
-    static class TestConfig {
-
-        @Bean("loadBalancedRestClientBuilder")
-        public RestClient.Builder loadBalancedRestClientBuilder(@Qualifier("baseRestClientBuilder") RestClient.Builder restClientBuilder) {
-            return restClientBuilder;
-        }
-
-    }
-
-    private static final String WORKLOAD_ENDPOINT = "/gym-crm/workload/api/v1/trainer-workloads";
     private static final String TRAINEE_USERNAME = "liam.miller";
     private static final String TRAINER_USERNAME = "marcus.stone";
     private static final String TRAINING_NAME = "Morning HIIT";
+    private static final int RECEIVE_TIMEOUT = 2000;
+
+    @Value("${app.jms.queues.trainer-workload}")
+    private String queueName;
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
 
     @Autowired
     private GymFacade facade;
 
     @BeforeEach
-    void setUpWireMock() {
-        stubFor(post(urlEqualTo(WORKLOAD_ENDPOINT))
-                .willReturn(aResponse().withStatus(200)));
+    void clearQueue() {
+        jmsTemplate.setReceiveTimeout(50);
+        while (jmsTemplate.receive(queueName) != null) {
+            // clear queue
+        }
+
+        jmsTemplate.setReceiveTimeout(RECEIVE_TIMEOUT);
     }
 
     @DynamicPropertySource
@@ -175,7 +165,7 @@ class GymFacadeIntegrationTest {
         boolean actual = facade.deleteTraineeByUsername(TRAINEE_USERNAME);
 
         assertTrue(actual);
-        verify(postRequestedFor(urlEqualTo(WORKLOAD_ENDPOINT)));
+        assertNotNull(jmsTemplate.receive(queueName));
     }
 
     @Test
@@ -247,7 +237,7 @@ class GymFacadeIntegrationTest {
         assertNotNull(trainings);
         assertEquals(2, trainings.size());
         assertTrue(trainings.stream().anyMatch(t -> "Evening Yoga".equals(t.getTrainingName())));
-        verify(postRequestedFor(urlEqualTo(WORKLOAD_ENDPOINT)));
+        assertNotNull(jmsTemplate.receive(queueName));
     }
 
     @Test

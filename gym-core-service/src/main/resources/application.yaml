@@ -54,7 +54,6 @@ app:
   security:
     jwt:
       access-expiration-ms: 86400000
-  services:
-    workload:
-      url: http://workload-service/gym-crm/workload/api/v1
-      timeout-seconds: 3
+  jms:
+    queues:
+      trainer-workload: trainer.workload.updates

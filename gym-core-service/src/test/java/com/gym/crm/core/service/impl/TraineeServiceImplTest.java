@@ -1,6 +1,5 @@
 package com.gym.crm.core.service.impl;
 
-import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.dto.filter.TraineeTrainingSearchFilter;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
@@ -8,6 +7,7 @@ import com.gym.crm.core.entity.Training;
 import com.gym.crm.core.entity.User;
 import com.gym.crm.core.exception.ConflictException;
 import com.gym.crm.core.exception.EntityNotFoundException;
+import com.gym.crm.core.messaging.TrainerWorkloadPublisher;
 import com.gym.crm.core.repository.TraineeRepository;
 import com.gym.crm.core.repository.TrainerRepository;
 import com.gym.crm.core.repository.TrainingRepository;
@@ -70,7 +70,7 @@ class TraineeServiceImplTest {
     private TraineeTrainingCriteriaBuilder trainingCriteriaBuilder;
 
     @Mock
-    private WorkloadClientFacade workloadClientFacade;
+    private TrainerWorkloadPublisher trainerWorkloadPublisher;
 
     @InjectMocks
     private TraineeServiceImpl service;
@@ -370,7 +370,7 @@ class TraineeServiceImplTest {
 
         assertTrue(result);
         verify(repository).delete(trainee);
-        verify(workloadClientFacade).deleteWorkload(training);
+        verify(trainerWorkloadPublisher).deleteWorkload(training);
     }
 
     @Test

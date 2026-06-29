@@ -8,6 +8,10 @@ spring:
     properties:
       hibernate:
         format_sql: false
+  activemq:
+    broker-url: ${ACTIVEMQ_BROKER_URL}
+    user: ${ACTIVEMQ_USER}
+    password: ${ACTIVEMQ_PASSWORD}
 
 eureka:
   client:

@@ -7,6 +7,7 @@ This microservice handles the core logic for the Gym CRM application, including 
 In addition to the global prerequisites, you will need:
 * MySQL Server (8.0+) or Docker (to run MySQL inside a container)
 * Redis Server (6.0+) or Docker (to run Redis inside a container)
+* ActiveMQ broker or Docker
 
 ## Setup and Running
 
@@ -45,12 +46,26 @@ If you prefer Docker, you can start a Redis container with the default port setu
 docker run --name gym-redis -p 6379:6379 -d redis
 ```
 
-### Step 3: Run the Application
+### Step 3: Set Up ActiveMQ
+
+This service publishes trainer workload update messages to ActiveMQ. Follow the shared broker setup in the [root README](../README.md#step-3-start-shared-infrastructure).
+
+Local profile defaults to:
+
+* **Broker URL**: `failover:(tcp://localhost:61616)`
+* **Username**: `gym`
+* **Password**: `gym`
+
+If your broker credentials differ from the local profile defaults above, override service credentials at startup via
+`SPRING_ACTIVEMQ_USER` / `SPRING_ACTIVEMQ_PASSWORD` or equivalent Spring Boot arguments or change ActiveMQ username and password for user.
+
+### Step 4: Run the Application
 
 > [!IMPORTANT]
 > The following platform microservices must be running for this service to function properly:
 > * **[Discovery Server](../discovery-server/README.md)**: Service registry required for Eureka discovery.
-> * **[Workload Service](../workload-service/README.md)**: Handles trainer workloads (communicated with via REST).
+> * **[Workload Service](../workload-service/README.md)**: Handles trainer workloads (consumes trainer workload updates from ActiveMQ).
+> * **ActiveMQ broker**: Required for JMS message publishing.
 >
 > Ensure these services are started before running the core service.
 

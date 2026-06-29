@@ -1,12 +1,12 @@
 package com.gym.crm.core.service.impl;
 
-import com.gym.crm.core.client.WorkloadClientFacade;
 import com.gym.crm.core.entity.Trainee;
 import com.gym.crm.core.entity.Trainer;
 import com.gym.crm.core.entity.Training;
 import com.gym.crm.core.entity.TrainingType;
 import com.gym.crm.core.entity.User;
 import com.gym.crm.core.exception.EntityNotFoundException;
+import com.gym.crm.core.messaging.TrainerWorkloadPublisher;
 import com.gym.crm.core.repository.TraineeRepository;
 import com.gym.crm.core.repository.TrainerRepository;
 import com.gym.crm.core.repository.TrainingRepository;
@@ -53,7 +53,7 @@ class TrainingServiceImplTest {
     private TrainingTypeRepository trainingTypeRepository;
 
     @Mock
-    private WorkloadClientFacade workloadClientFacade;
+    private TrainerWorkloadPublisher trainerWorkloadPublisher;
 
     @InjectMocks
     private TrainingServiceImpl service;
@@ -81,7 +81,7 @@ class TrainingServiceImplTest {
         verify(traineeRepository).findByUsername(TRAINEE_USERNAME);
         verify(trainerRepository).findByUsername(TRAINER_USERNAME);
         verify(trainingRepository).save(any(Training.class));
-        verify(workloadClientFacade).addWorkload(expected);
+        verify(trainerWorkloadPublisher).addWorkload(expected);
     }
 
     @Test
@@ -190,7 +190,7 @@ class TrainingServiceImplTest {
         service.deleteTraining(id, TRAINER_USERNAME);
 
         verify(trainingRepository).findById(id);
-        verify(workloadClientFacade).deleteWorkload(training);
+        verify(trainerWorkloadPublisher).deleteWorkload(training);
         verify(trainingRepository).delete(training);
     }
 
@@ -205,7 +205,7 @@ class TrainingServiceImplTest {
 
         assertEquals("Access Denied: You are not the trainer of this training", exception.getMessage());
         verify(trainingRepository).findById(id);
-        verifyNoInteractions(workloadClientFacade);
+        verifyNoInteractions(trainerWorkloadPublisher);
         verify(trainingRepository, never()).delete(any(Training.class));
     }
 
@@ -219,7 +219,7 @@ class TrainingServiceImplTest {
 
         assertEquals("Training not found with ID: " + id, exception.getMessage());
         verify(trainingRepository).findById(id);
-        verifyNoInteractions(workloadClientFacade);
+        verifyNoInteractions(trainerWorkloadPublisher);
         verify(trainingRepository, never()).delete(any(Training.class));
     }
 
