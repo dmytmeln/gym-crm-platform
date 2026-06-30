@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 
+import java.util.List;
+
 import static jakarta.jms.Session.AUTO_ACKNOWLEDGE;
 
 @Configuration
@@ -24,6 +26,7 @@ public class WorkloadJmsConfig {
     private static final long DLQ_MAXIMUM_REDELIVERY_DELAY_MS = 0L;
     private static final double DLQ_BACK_OFF_MULTIPLIER = 1.0;
     private static final boolean DLQ_USE_EXPONENTIAL_MULTIPLIER = false;
+    private static final List<String> TRUSTED_PACKAGES = List.of("java.lang", "java.util", "com.gym.crm");
 
     @Bean
     public ActiveMQConnectionFactoryCustomizer activeMqConnectionFactoryCustomizer(JmsRedeliveryProperties jmsRedeliveryProperties) {
@@ -51,6 +54,8 @@ public class WorkloadJmsConfig {
         connectionFactory.setBrokerURL(brokerUrl);
         connectionFactory.setUserName(username);
         connectionFactory.setPassword(password);
+        connectionFactory.setTrustAllPackages(false);
+        connectionFactory.setTrustedPackages(TRUSTED_PACKAGES);
 
         customizers.orderedStream().forEach(customizer -> customizer.customize(connectionFactory));
 
@@ -68,6 +73,8 @@ public class WorkloadJmsConfig {
         deadLetterQueueConnectionFactory.setBrokerURL(brokerUrl);
         deadLetterQueueConnectionFactory.setUserName(username);
         deadLetterQueueConnectionFactory.setPassword(password);
+        deadLetterQueueConnectionFactory.setTrustAllPackages(false);
+        deadLetterQueueConnectionFactory.setTrustedPackages(TRUSTED_PACKAGES);
 
         RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
         redeliveryPolicy.setInitialRedeliveryDelay(DLQ_INITIAL_REDELIVERY_DELAY_MS);
