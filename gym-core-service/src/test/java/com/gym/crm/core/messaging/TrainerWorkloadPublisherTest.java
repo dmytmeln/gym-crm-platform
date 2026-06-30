@@ -25,9 +25,12 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.LocalDate;
 
 import static ch.qos.logback.classic.Level.ERROR;
+import static ch.qos.logback.classic.Level.INFO;
 import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
+import static com.gym.crm.workload.contract.WorkloadActionType.ADD;
 import static java.time.Month.JUNE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,6 +46,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class TrainerWorkloadPublisherTest {
 
+    private static final String TRAINER_USERNAME = "trainer.user";
     private static final String QUEUE_NAME = "trainer-workload-queue";
     private static final String TRANSACTION_ID_VALUE = "valid-tx-12345";
     private static final String UPDATED_TRANSACTION_ID_VALUE = "updated-tx-67890";
@@ -119,6 +123,8 @@ class TrainerWorkloadPublisherTest {
     void shouldLogJmsFailureWithoutPropagatingFromAfterCommitCallback() {
         Training training = buildTestTraining();
         JmsException expected = new JmsException("send failed") {};
+        String expectedErrorMessage = "Failed to publish workload update message for trainer: %s (action: %s, queue: %s, transactionId: %s)"
+                .formatted(TRAINER_USERNAME, ADD, QUEUE_NAME, TRANSACTION_ID_VALUE);
         TransactionSynchronization synchronization = registerAddWorkloadSynchronization(training);
 
         doThrow(expected).when(jmsTemplate).convertAndSend(eq(QUEUE_NAME), any(), any(MessagePostProcessor.class));
@@ -127,15 +133,13 @@ class TrainerWorkloadPublisherTest {
 
         verify(jmsTemplate).convertAndSend(eq(QUEUE_NAME), any(), any(MessagePostProcessor.class));
         assertThat(listAppender.list)
-                .filteredOn(loggingEvent -> loggingEvent.getLevel() == ERROR)
-                .singleElement()
-                .satisfies(loggingEvent -> {
-                    assertThat(loggingEvent.getFormattedMessage())
-                            .contains("Failed to publish workload update message for trainer: trainer.user")
-                            .contains("queue: " + QUEUE_NAME)
-                            .contains("transactionId: " + TRANSACTION_ID_VALUE);
-                    assertThat(loggingEvent.getThrowableProxy().getMessage()).isEqualTo("send failed");
-                });
+                .extracting(ILoggingEvent::getLevel, ILoggingEvent::getFormattedMessage)
+                .containsExactly(tuple(INFO, "Registering after-commit transaction synchronization for workload update: %s (action: %s)"
+                                .formatted(TRAINER_USERNAME, ADD)),
+                        tuple(INFO, "Publishing workload update message for trainer: %s (action: %s)".formatted(TRAINER_USERNAME, ADD)),
+                        tuple(ERROR, expectedErrorMessage));
+        ILoggingEvent loggingEvent = listAppender.list.getLast();
+        assertThat(loggingEvent.getThrowableProxy().getMessage()).isEqualTo("send failed");
     }
 
     private TransactionSynchronization registerAddWorkloadSynchronization(Training training) {
@@ -147,7 +151,7 @@ class TrainerWorkloadPublisherTest {
 
     private Training buildTestTraining() {
         User user = User.builder()
-                .username("trainer.user")
+                .username(TRAINER_USERNAME)
                 .firstName("First")
                 .lastName("Last")
                 .isActive(true)

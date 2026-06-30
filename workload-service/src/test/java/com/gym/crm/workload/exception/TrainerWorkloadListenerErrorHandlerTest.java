@@ -40,39 +40,35 @@ class TrainerWorkloadListenerErrorHandlerTest {
     @Test
     void shouldLogContextWhenHandlingWrappedProcessingException() {
         RuntimeException cause = new RuntimeException("processing failed");
-        TrainerWorkloadProcessingException exception = new TrainerWorkloadProcessingException(TRANSACTION_ID_VALUE, "trainer.user", ADD, cause);
+        String username = "trainer.user";
+        String expectedLogMessage = "Failed to process workload update message for trainer: %s (action: %s, transactionId: %s)"
+                .formatted(username, ADD, TRANSACTION_ID_VALUE);
+        TrainerWorkloadProcessingException exception = new TrainerWorkloadProcessingException(TRANSACTION_ID_VALUE, username, ADD, cause);
         ListenerExecutionFailedException listenerException = new ListenerExecutionFailedException("listener failed", exception);
 
         errorHandler.handleError(listenerException);
 
-        assertThat(listAppender.list)
-                .filteredOn(loggingEvent -> loggingEvent.getLevel() == ERROR)
-                .singleElement()
-                .satisfies(loggingEvent -> {
-                    assertThat(loggingEvent.getFormattedMessage())
-                            .contains("Failed to process workload update message for trainer: trainer.user")
-                            .contains("action: ADD")
-                            .contains("transactionId: " + TRANSACTION_ID_VALUE);
-                    assertThat(loggingEvent.getThrowableProxy().getMessage())
-                            .isEqualTo("Failed to process trainer workload message");
-                });
+        assertThat(listAppender.list).hasSize(1);
+        ILoggingEvent loggingEvent = listAppender.list.getFirst();
+        assertThat(loggingEvent.getLevel()).isEqualTo(ERROR);
+        assertThat(loggingEvent.getFormattedMessage()).isEqualTo(expectedLogMessage);
+        assertThat(loggingEvent.getThrowableProxy().getMessage()).isEqualTo("Failed to process trainer workload message");
     }
 
     @Test
     void shouldLogGenericFailureWhenHandlingPreMethodException() {
         MessageConversionException exception = new MessageConversionException("invalid json");
-        ListenerExecutionFailedException listenerException = new ListenerExecutionFailedException("listener failed", exception);
+        String listenerErrorMsg = "listener failed";
+        ListenerExecutionFailedException listenerException = new ListenerExecutionFailedException(listenerErrorMsg, exception);
+        String expectedLogMessage = "Failed before trainer workload listener method execution";
 
         errorHandler.handleError(listenerException);
 
-        assertThat(listAppender.list)
-                .filteredOn(loggingEvent -> loggingEvent.getLevel() == ERROR)
-                .singleElement()
-                .satisfies(loggingEvent -> {
-                    assertThat(loggingEvent.getFormattedMessage())
-                            .contains("Failed before trainer workload listener method execution");
-                    assertThat(loggingEvent.getThrowableProxy().getMessage()).isEqualTo("listener failed");
-                });
+        assertThat(listAppender.list).hasSize(1);
+        ILoggingEvent loggingEvent = listAppender.list.getFirst();
+        assertThat(loggingEvent.getLevel()).isEqualTo(ERROR);
+        assertThat(loggingEvent.getFormattedMessage()).isEqualTo(expectedLogMessage);
+        assertThat(loggingEvent.getThrowableProxy().getMessage()).isEqualTo(listenerErrorMsg);
     }
 
 }

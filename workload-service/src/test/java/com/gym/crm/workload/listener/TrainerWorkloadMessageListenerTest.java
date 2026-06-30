@@ -25,7 +25,7 @@ import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
 import static com.gym.crm.workload.contract.WorkloadActionType.ADD;
 import static java.time.Month.JUNE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 class TrainerWorkloadMessageListenerTest {
 
     private static final String TRANSACTION_ID_VALUE = "tx-workload-987";
+    private static final String TRAINER_USERNAME = "trainer.user";
     private static final String VALIDATION_FAILURE_REASON = "username: Username is required";
     private static final String INVALID_TRANSACTION_ID = "invalid transaction id";
     private static final String GENERATED_TRANSACTION_ID_PATTERN = "^[a-f0-9\\-]{36}$";
@@ -118,14 +119,14 @@ class TrainerWorkloadMessageListenerTest {
             throw expected;
         }).when(deadLetterQueuePublisher).publish(message, VALIDATION_FAILURE_REASON, TRANSACTION_ID_VALUE);
 
-        assertThatThrownBy(() -> listener.receiveMessage(message, TRANSACTION_ID_VALUE))
-                .isInstanceOfSatisfying(TrainerWorkloadProcessingException.class, actual -> {
-                    assertThat(actual.getTransactionId()).isEqualTo(TRANSACTION_ID_VALUE);
-                    assertThat(actual.getTrainerUsername()).isEqualTo("trainer.user");
-                    assertThat(actual.getActionType()).isEqualTo(ADD);
-                    assertThat(actual.getCause()).isSameAs(expected);
-                });
+        Throwable actualThrowable = catchThrowable(() -> listener.receiveMessage(message, TRANSACTION_ID_VALUE));
 
+        assertThat(actualThrowable).isInstanceOf(TrainerWorkloadProcessingException.class);
+        TrainerWorkloadProcessingException actual = (TrainerWorkloadProcessingException) actualThrowable;
+        assertThat(actual.getTransactionId()).isEqualTo(TRANSACTION_ID_VALUE);
+        assertThat(actual.getTrainerUsername()).isEqualTo(TRAINER_USERNAME);
+        assertThat(actual.getActionType()).isEqualTo(ADD);
+        assertThat(actual.getCause()).isSameAs(expected);
         verify(deadLetterQueuePublisher).publish(message, VALIDATION_FAILURE_REASON, TRANSACTION_ID_VALUE);
         verifyNoInteractions(mapper);
         verifyNoInteractions(service);
@@ -145,14 +146,14 @@ class TrainerWorkloadMessageListenerTest {
             throw expected;
         }).when(service).updateWorkload(domainUpdate);
 
-        assertThatThrownBy(() -> listener.receiveMessage(message, TRANSACTION_ID_VALUE))
-                .isInstanceOfSatisfying(TrainerWorkloadProcessingException.class, actual -> {
-                    assertThat(actual.getTransactionId()).isEqualTo(TRANSACTION_ID_VALUE);
-                    assertThat(actual.getTrainerUsername()).isEqualTo("trainer.user");
-                    assertThat(actual.getActionType()).isEqualTo(ADD);
-                    assertThat(actual.getCause()).isSameAs(expected);
-                });
+        Throwable actualThrowable = catchThrowable(() -> listener.receiveMessage(message, TRANSACTION_ID_VALUE));
 
+        assertThat(actualThrowable).isInstanceOf(TrainerWorkloadProcessingException.class);
+        TrainerWorkloadProcessingException actual = (TrainerWorkloadProcessingException) actualThrowable;
+        assertThat(actual.getTransactionId()).isEqualTo(TRANSACTION_ID_VALUE);
+        assertThat(actual.getTrainerUsername()).isEqualTo(TRAINER_USERNAME);
+        assertThat(actual.getActionType()).isEqualTo(ADD);
+        assertThat(actual.getCause()).isSameAs(expected);
         verify(service).updateWorkload(domainUpdate);
         verify(deadLetterQueuePublisher, never()).publish(message, VALIDATION_FAILURE_REASON, TRANSACTION_ID_VALUE);
         assertThat(MDC.get(TRANSACTION_ID)).isNull();
@@ -160,7 +161,7 @@ class TrainerWorkloadMessageListenerTest {
 
     private TrainerWorkloadUpdateMessage buildMessage() {
         return TrainerWorkloadUpdateMessage.builder()
-                .username("trainer.user")
+                .username(TRAINER_USERNAME)
                 .firstName("Liam")
                 .lastName("Miller")
                 .isActive(true)
@@ -171,7 +172,7 @@ class TrainerWorkloadMessageListenerTest {
     }
 
     private TrainerWorkloadUpdate buildDomainUpdate() {
-        return new TrainerWorkloadUpdate("trainer.user",
+        return new TrainerWorkloadUpdate(TRAINER_USERNAME,
                 "Liam",
                 "Miller",
                 true,

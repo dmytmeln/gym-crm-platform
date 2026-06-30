@@ -63,7 +63,11 @@ class TrainerWorkloadDeadLetterQueueListenerIntegrationTest {
     @Test
     void shouldAcknowledgeApplicationDeadLetterMessageWithoutForwardingToBrokerDeadLetterQueue() {
         String transactionId = "dlq-tx-54321";
-        TrainerWorkloadDeadLetterMessage message = createDeadLetterMessage(transactionId);
+        String username = "dlq.ack.trainer";
+        String failureReason = "downstream storage failure";
+        TrainerWorkloadDeadLetterMessage message = createDeadLetterMessage(transactionId, username, failureReason);
+        String expectedLogMessage = "Consumed workload dead letter message for trainer: %s (action: %s, failureReason: %s, transactionId: %s)"
+                .formatted(username, message.originalMessage().actionType(), failureReason, transactionId);
 
         jmsTemplate.convertAndSend(trainerWorkloadDeadLetterQueue, message, jmsMessage -> {
             jmsMessage.setStringProperty(TRANSACTION_ID, transactionId);
@@ -72,12 +76,10 @@ class TrainerWorkloadDeadLetterQueueListenerIntegrationTest {
 
         assertThat(jmsTemplate.receive(trainerWorkloadDeadLetterQueue)).isNull();
         assertThat(jmsTemplate.receive(BROKER_DEAD_LETTER_QUEUE)).isNull();
-        assertThat(deadLetterQueueAppender.list)
-                .filteredOn(loggingEvent -> loggingEvent.getLevel() == ERROR)
-                .anySatisfy(loggingEvent -> assertThat(loggingEvent.getFormattedMessage())
-                        .contains("Consumed workload dead letter message for trainer: dlq.ack.trainer")
-                        .contains("failureReason: downstream storage failure")
-                        .contains("transactionId: " + transactionId));
+        assertThat(deadLetterQueueAppender.list).hasSize(1);
+        ILoggingEvent loggingEvent = deadLetterQueueAppender.list.getFirst();
+        assertThat(loggingEvent.getLevel()).isEqualTo(ERROR);
+        assertThat(loggingEvent.getFormattedMessage()).isEqualTo(expectedLogMessage);
     }
 
     private void clearQueue(String queueName) {
@@ -86,9 +88,11 @@ class TrainerWorkloadDeadLetterQueueListenerIntegrationTest {
         }
     }
 
-    private TrainerWorkloadDeadLetterMessage createDeadLetterMessage(String transactionId) {
+    private TrainerWorkloadDeadLetterMessage createDeadLetterMessage(String transactionId,
+                                                                     String username,
+                                                                     String failureReason) {
         TrainerWorkloadUpdateMessage originalMessage = TrainerWorkloadUpdateMessage.builder()
-                .username("dlq.ack.trainer")
+                .username(username)
                 .firstName("Nina")
                 .lastName("Cole")
                 .isActive(true)
@@ -99,7 +103,7 @@ class TrainerWorkloadDeadLetterQueueListenerIntegrationTest {
 
         return TrainerWorkloadDeadLetterMessage.builder()
                 .originalMessage(originalMessage)
-                .failureReason("downstream storage failure")
+                .failureReason(failureReason)
                 .transactionId(transactionId)
                 .build();
     }

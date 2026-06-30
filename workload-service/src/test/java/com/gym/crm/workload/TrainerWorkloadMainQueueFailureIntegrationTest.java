@@ -28,6 +28,7 @@ import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
 import static com.gym.crm.workload.contract.WorkloadActionType.ADD;
 import static java.time.Month.JUNE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.verify;
@@ -88,6 +89,7 @@ class TrainerWorkloadMainQueueFailureIntegrationTest {
     void shouldPublishInvalidWorkloadToApplicationDeadLetterQueueWithoutUpdatingRepository() {
         String username = "invalid.trainer";
         String transactionId = "valid-tx-12345";
+        String failureReason = "trainingDuration: Training duration is required";
         TrainerWorkloadUpdateMessage message = TrainerWorkloadUpdateMessage.builder()
                 .username(username)
                 .firstName("Marcus")
@@ -97,6 +99,8 @@ class TrainerWorkloadMainQueueFailureIntegrationTest {
                 .trainingDuration(null)
                 .actionType(ADD)
                 .build();
+        String expectedLogMessage = "Consumed workload dead letter message for trainer: %s (action: %s, failureReason: %s, transactionId: %s)"
+                        .formatted(username, message.actionType(), failureReason, transactionId);
 
         jmsTemplate.convertAndSend(trainerWorkloadQueue, message, jmsMessage -> {
             jmsMessage.setStringProperty(TRANSACTION_ID, transactionId);
@@ -105,17 +109,16 @@ class TrainerWorkloadMainQueueFailureIntegrationTest {
 
         assertThat(jmsTemplate.receive(trainerWorkloadDeadLetterQueue)).isNull();
         assertThat(repository.findByUsername(username)).isEmpty();
-        assertThat(deadLetterQueueAppender.list)
-                .filteredOn(loggingEvent -> loggingEvent.getLevel() == ERROR)
-                .anySatisfy(loggingEvent -> assertThat(loggingEvent.getFormattedMessage())
-                        .contains("Consumed workload dead letter message for trainer: " + username)
-                        .contains("failureReason: trainingDuration: Training duration is required")
-                        .contains("transactionId: " + transactionId));
+        assertThat(deadLetterQueueAppender.list).hasSize(1);
+        ILoggingEvent loggingEvent = deadLetterQueueAppender.list.getFirst();
+        assertThat(loggingEvent.getLevel()).isEqualTo(ERROR);
+        assertThat(loggingEvent.getFormattedMessage()).isEqualTo(expectedLogMessage);
     }
 
     @Test
     void shouldRouteInvalidJsonToBrokerDeadLetterQueueWithoutPublishingApplicationDeadLetterMessage() {
         String invalidJson = "{invalid-json";
+        String expectedLogMessage = "Failed before trainer workload listener method execution";
 
         jmsTemplate.send(trainerWorkloadQueue, session -> {
             Message jmsMessage = session.createTextMessage(invalidJson);
@@ -126,9 +129,10 @@ class TrainerWorkloadMainQueueFailureIntegrationTest {
         assertThat(jmsTemplate.receive(BROKER_DEAD_LETTER_QUEUE)).isNotNull();
         assertThat(jmsTemplate.receive(trainerWorkloadDeadLetterQueue)).isNull();
         assertThat(errorHandlerAppender.list)
-                .filteredOn(loggingEvent -> loggingEvent.getLevel() == ERROR)
-                .anySatisfy(loggingEvent -> assertThat(loggingEvent.getFormattedMessage())
-                        .contains("Failed before trainer workload listener method execution"));
+                .extracting(ILoggingEvent::getLevel, ILoggingEvent::getFormattedMessage)
+                .containsExactly(tuple(ERROR, expectedLogMessage),
+                        tuple(ERROR, expectedLogMessage),
+                        tuple(ERROR, expectedLogMessage));
         verify(listener, after(1_000).never()).receiveMessage(any(), any());
     }
 
