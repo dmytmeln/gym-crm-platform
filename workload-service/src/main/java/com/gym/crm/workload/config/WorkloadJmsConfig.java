@@ -91,11 +91,14 @@ public class WorkloadJmsConfig {
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(@Qualifier("connectionFactory")
                                                                           ConnectionFactory connectionFactory,
                                                                           DefaultJmsListenerContainerFactoryConfigurer configurer,
-                                                                          TrainerWorkloadListenerErrorHandler trainerWorkloadListenerErrorHandler) {
+                                                                          TrainerWorkloadListenerErrorHandler trainerWorkloadListenerErrorHandler,
+                                                                          @Value("${app.jms.concurrency}")
+                                                                          String concurrency) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         configurer.configure(factory, connectionFactory);
         factory.setSessionTransacted(true);
         factory.setErrorHandler(trainerWorkloadListenerErrorHandler);
+        factory.setConcurrency(concurrency);
 
         return factory;
     }

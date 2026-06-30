@@ -19,6 +19,7 @@ app:
     queues:
       trainer-workload: ${JMS_QUEUE_TRAINER_WORKLOAD}
       trainer-workload-dlq: ${JMS_QUEUE_TRAINER_WORKLOAD_DLQ}
+    concurrency: ${JMS_CONCURRENCY}
     redelivery:
       initial-delay-ms: ${JMS_REDELIVERY_INITIAL_DELAY_MS}
       maximum-redeliveries: ${JMS_REDELIVERY_MAXIMUM_REDELIVERIES}
