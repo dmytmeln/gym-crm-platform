@@ -7,6 +7,7 @@ import com.gym.crm.workload.contract.WorkloadActionType;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 import org.springframework.stereotype.Component;
@@ -68,7 +69,16 @@ public class TrainerWorkloadPublisher {
 
     private void sendJmsMessage(TrainerWorkloadUpdateMessage message, String transactionId) {
         log.info("Publishing workload update message for trainer: {} (action: {})", message.username(), message.actionType());
-        jmsTemplate.convertAndSend(queueName, message, propagateTransactionId(transactionId));
+        try {
+            jmsTemplate.convertAndSend(queueName, message, propagateTransactionId(transactionId));
+        } catch (JmsException exception) {
+            log.error("Failed to publish workload update message for trainer: {} (action: {}, queue: {}, transactionId: {})",
+                    message.username(),
+                    message.actionType(),
+                    queueName,
+                    transactionId,
+                    exception);
+        }
     }
 
     private MessagePostProcessor propagateTransactionId(String transactionId) {

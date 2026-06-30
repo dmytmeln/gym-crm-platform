@@ -3,6 +3,7 @@ package com.gym.crm.workload.listener;
 import com.gym.crm.logging.TransactionContext;
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
 import com.gym.crm.workload.dto.TrainerWorkloadUpdate;
+import com.gym.crm.workload.exception.TrainerWorkloadProcessingException;
 import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
 import com.gym.crm.workload.service.TrainerWorkloadDeadLetterQueuePublisher;
 import com.gym.crm.workload.service.TrainerWorkloadMessageValidator;
@@ -10,6 +11,7 @@ import com.gym.crm.workload.service.TrainerWorkloadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
@@ -46,15 +48,30 @@ public class TrainerWorkloadMessageListener {
 
         if (validationFailureReason.isPresent()) {
             log.warn("Sending invalid workload update message to DLQ: {}", validationFailureReason.get());
-            deadLetterQueuePublisher.publish(message, validationFailureReason.get(), resolvedTransactionId);
+            publishDeadLetterQueueMessage(message, resolvedTransactionId, validationFailureReason.get());
 
             return;
         }
 
         log.info("Received workload update message for trainer: {} (action: {})", message.username(), message.actionType());
-        TrainerWorkloadUpdate domainUpdate = mapper.toDomainUpdate(message);
+        updateWorkload(message, resolvedTransactionId);
+    }
 
-        service.updateWorkload(domainUpdate);
+    private void publishDeadLetterQueueMessage(TrainerWorkloadUpdateMessage message, String resolvedTransactionId, String validationFailureReason) {
+        try {
+            deadLetterQueuePublisher.publish(message, validationFailureReason, resolvedTransactionId);
+        } catch (JmsException exception) {
+            throw new TrainerWorkloadProcessingException(resolvedTransactionId, message.username(), message.actionType(), exception);
+        }
+    }
+
+    private void updateWorkload(TrainerWorkloadUpdateMessage message, String resolvedTransactionId) {
+        try {
+            TrainerWorkloadUpdate domainUpdate = mapper.toDomainUpdate(message);
+            service.updateWorkload(domainUpdate);
+        } catch (RuntimeException exception) {
+            throw new TrainerWorkloadProcessingException(resolvedTransactionId, message.username(), message.actionType(), exception);
+        }
     }
 
 }

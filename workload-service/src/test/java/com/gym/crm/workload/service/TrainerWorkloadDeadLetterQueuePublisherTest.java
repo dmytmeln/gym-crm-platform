@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 
@@ -18,7 +19,10 @@ import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
 import static com.gym.crm.workload.contract.WorkloadActionType.ADD;
 import static java.time.Month.JUNE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -54,6 +58,17 @@ class TrainerWorkloadDeadLetterQueuePublisherTest {
         assertThat(deadLetterMessageCaptor.getValue().failureReason()).isEqualTo(FAILURE_REASON);
         assertThat(deadLetterMessageCaptor.getValue().transactionId()).isEqualTo(TRANSACTION_ID_VALUE);
         verify(jmsMessage).setStringProperty(TRANSACTION_ID, TRANSACTION_ID_VALUE);
+    }
+
+    @Test
+    void shouldPropagateJmsFailureWhenPublishingDeadLetterMessage() {
+        TrainerWorkloadUpdateMessage message = buildMessage();
+        JmsException expected = new JmsException("dlq send failed") {};
+
+        doThrow(expected).when(jmsTemplate).convertAndSend(eq(DEAD_LETTER_QUEUE_NAME), any(), any(MessagePostProcessor.class));
+
+        assertThatThrownBy(() -> publisher.publish(message, FAILURE_REASON, TRANSACTION_ID_VALUE))
+                .isSameAs(expected);
     }
 
     private TrainerWorkloadUpdateMessage buildMessage() {
