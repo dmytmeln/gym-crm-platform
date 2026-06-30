@@ -13,6 +13,16 @@ app:
   security:
     jwt:
       secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  jms:
+    queues:
+      trainer-workload: local.trainer.workload.updates
+      trainer-workload-dlq: local.trainer.workload.updates.dlq
+    redelivery:
+      initial-delay-ms: 1000
+      maximum-redeliveries: 3
+      maximum-delay-ms: 10000
+      back-off-multiplier: 2.0
+      use-exponential-back-off: true
 
 logging:
   level:

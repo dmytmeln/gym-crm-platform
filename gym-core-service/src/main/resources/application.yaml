@@ -54,6 +54,3 @@ app:
   security:
     jwt:
       access-expiration-ms: 86400000
-  jms:
-    queues:
-      trainer-workload: trainer.workload.updates
