@@ -18,6 +18,7 @@ app:
     queues:
       trainer-workload: trainer.workload.updates
       trainer-workload-dlq: trainer.workload.updates.dlq
+    concurrency: 1-5
     redelivery:
       initial-delay-ms: 100
       maximum-redeliveries: 2
