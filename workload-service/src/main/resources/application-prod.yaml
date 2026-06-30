@@ -15,3 +15,13 @@ app:
   security:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
+  jms:
+    queues:
+      trainer-workload: ${JMS_QUEUE_TRAINER_WORKLOAD}
+      trainer-workload-dlq: ${JMS_QUEUE_TRAINER_WORKLOAD_DLQ}
+    redelivery:
+      initial-delay-ms: ${JMS_REDELIVERY_INITIAL_DELAY_MS}
+      maximum-redeliveries: ${JMS_REDELIVERY_MAXIMUM_REDELIVERIES}
+      maximum-delay-ms: ${JMS_REDELIVERY_MAXIMUM_DELAY_MS}
+      back-off-multiplier: ${JMS_REDELIVERY_BACK_OFF_MULTIPLIER}
+      use-exponential-back-off: ${JMS_REDELIVERY_USE_EXPONENTIAL_BACK_OFF}
