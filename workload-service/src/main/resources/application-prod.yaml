@@ -3,6 +3,13 @@ spring:
     broker-url: ${ACTIVEMQ_BROKER_URL}
     user: ${ACTIVEMQ_USER}
     password: ${ACTIVEMQ_PASSWORD}
+  data:
+    mongodb:
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      database: ${MONGO_DATABASE}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
 
 eureka:
   client:

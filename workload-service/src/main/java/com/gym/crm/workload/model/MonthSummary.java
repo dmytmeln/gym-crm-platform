@@ -3,17 +3,22 @@ package com.gym.crm.workload.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Month;
 
 import static lombok.AccessLevel.PRIVATE;
+import static org.springframework.data.mongodb.core.mapping.Field.Write.NON_NULL;
 
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = PRIVATE)
 public class MonthSummary {
 
+    @Field(name = "month", write = NON_NULL)
     private final Month month;
+
+    @Field(name = "working_hours", write = NON_NULL)
     private final Integer workingHours;
 
     public static MonthSummary of(Month month, int duration) {

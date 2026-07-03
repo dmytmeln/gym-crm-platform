@@ -4,19 +4,24 @@ import com.gym.crm.workload.dto.TrainingDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
+import static org.springframework.data.mongodb.core.mapping.Field.Write.NON_NULL;
 
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = PRIVATE)
 public class YearSummary {
 
+    @Field(name = "year", write = NON_NULL)
     private final Integer year;
+
+    @Field(name = "months", write = NON_NULL)
     private final List<MonthSummary> months;
 
     public static YearSummary of(TrainingDate date, int duration) {

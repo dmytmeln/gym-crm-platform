@@ -3,6 +3,13 @@ spring:
     broker-url: failover:(tcp://localhost:61616)
     user: gym
     password: gym
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: gym_workload
+      username: gym
+      password: gym
 
 eureka:
   client:
