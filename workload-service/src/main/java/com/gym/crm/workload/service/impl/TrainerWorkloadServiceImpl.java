@@ -54,7 +54,7 @@ public class TrainerWorkloadServiceImpl implements TrainerWorkloadService {
             case DELETE -> workload.decreaseWorkingHours(update.trainingDate(), update.trainingDuration());
         };
 
-        repository.update(updatedWorkload);
+        repository.save(updatedWorkload);
         log.info("Successfully updated workload for trainer: {}", update.username());
     }
 

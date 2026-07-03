@@ -3,6 +3,7 @@ package com.gym.crm.workload;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.gym.crm.workload.config.MongoContainerTestConfig;
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
 import com.gym.crm.workload.exception.TrainerWorkloadListenerErrorHandler;
 import com.gym.crm.workload.listener.TrainerWorkloadDeadLetterQueueListener;
@@ -19,6 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.time.LocalDate;
@@ -36,6 +39,11 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 @ActiveProfiles("test")
 class TrainerWorkloadMainQueueFailureIntegrationTest {
+
+    @DynamicPropertySource
+    static void setMongoProperties(DynamicPropertyRegistry registry) {
+        MongoContainerTestConfig.setMongoContainerProperties(registry);
+    }
 
     private static final String BROKER_DEAD_LETTER_QUEUE = "ActiveMQ.DLQ";
     private static final long DLQ_RECEIVE_TIMEOUT_MS = 5_000L;
@@ -100,7 +108,7 @@ class TrainerWorkloadMainQueueFailureIntegrationTest {
                 .actionType(ADD)
                 .build();
         String expectedLogMessage = "Consumed workload dead letter message for trainer: %s (action: %s, failureReason: %s, transactionId: %s)"
-                        .formatted(username, message.actionType(), failureReason, transactionId);
+                .formatted(username, message.actionType(), failureReason, transactionId);
 
         jmsTemplate.convertAndSend(trainerWorkloadQueue, message, jmsMessage -> {
             jmsMessage.setStringProperty(TRANSACTION_ID, transactionId);

@@ -5,11 +5,7 @@ spring:
     password: ${ACTIVEMQ_PASSWORD}
   data:
     mongodb:
-      host: ${MONGO_HOST}
-      port: ${MONGO_PORT}
-      database: ${MONGO_DATABASE}
-      username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}
+      uri: ${MONGO_URI}
 
 eureka:
   client:

@@ -69,7 +69,7 @@ class TrainerWorkloadServiceImplTest {
 
         service.updateWorkload(update);
 
-        verify(repository).update(any(TrainerWorkload.class));
+        verify(repository).save(any(TrainerWorkload.class));
     }
 
     @Test
@@ -80,7 +80,7 @@ class TrainerWorkloadServiceImplTest {
 
         service.updateWorkload(update);
 
-        verify(repository, never()).update(any(TrainerWorkload.class));
+        verify(repository, never()).save(any(TrainerWorkload.class));
     }
 
     @Test
@@ -94,7 +94,7 @@ class TrainerWorkloadServiceImplTest {
         service.updateWorkload(update);
 
         ArgumentCaptor<TrainerWorkload> captor = ArgumentCaptor.forClass(TrainerWorkload.class);
-        verify(repository).update(captor.capture());
+        verify(repository).save(captor.capture());
         TrainerWorkload captured = captor.getValue();
         assertThat(captured.getFirstName()).isEqualTo("NewFirstName");
         assertThat(captured.getLastName()).isEqualTo("NewLastName");
@@ -112,7 +112,7 @@ class TrainerWorkloadServiceImplTest {
         service.updateWorkload(update);
 
         ArgumentCaptor<TrainerWorkload> captor = ArgumentCaptor.forClass(TrainerWorkload.class);
-        verify(repository).update(captor.capture());
+        verify(repository).save(captor.capture());
         TrainerWorkload captured = captor.getValue();
         assertThat(captured.getFirstName()).isEqualTo("NewFirstName");
         assertThat(captured.getLastName()).isEqualTo("NewLastName");
