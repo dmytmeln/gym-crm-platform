@@ -5,11 +5,7 @@ spring:
     password: gym
   data:
     mongodb:
-      host: localhost
-      port: 27017
-      database: gym_workload
-      username: gym
-      password: gym
+      uri: mongodb://gym:gym@localhost:27017/gym_workload?authSource=admin
 
 eureka:
   client:
