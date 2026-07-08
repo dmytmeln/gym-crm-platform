@@ -85,8 +85,15 @@ class TrainerWorkloadServiceImplTest {
 
     @Test
     void shouldUpdateWorkloadOnAddWhenExists() {
-        TrainerWorkloadUpdate update = new TrainerWorkloadUpdate(USERNAME, "NewFirstName", "NewLastName", false,
-                TrainingDate.of(2025, JUNE), 60, ADD);
+        TrainerWorkloadUpdate update = TrainerWorkloadUpdate.builder()
+                .username(USERNAME)
+                .firstName("NewFirstName")
+                .lastName("NewLastName")
+                .isActive(false)
+                .trainingDate(TrainingDate.of(2025, JUNE))
+                .trainingDuration(60)
+                .actionType(ADD)
+                .build();
         TrainerWorkload workload = buildTrainerWorkload(60);
 
         when(repository.findByUsername(USERNAME)).thenReturn(Optional.of(workload));
@@ -103,8 +110,15 @@ class TrainerWorkloadServiceImplTest {
 
     @Test
     void shouldUpdateWorkloadOnDeleteWhenExists() {
-        TrainerWorkloadUpdate update = new TrainerWorkloadUpdate(USERNAME, "NewFirstName", "NewLastName", false,
-                TrainingDate.of(2025, JUNE), 40, DELETE);
+        TrainerWorkloadUpdate update = TrainerWorkloadUpdate.builder()
+                .username(USERNAME)
+                .firstName("NewFirstName")
+                .lastName("NewLastName")
+                .isActive(false)
+                .trainingDate(TrainingDate.of(2025, JUNE))
+                .trainingDuration(40)
+                .actionType(DELETE)
+                .build();
         TrainerWorkload workload = buildTrainerWorkload(100);
 
         when(repository.findByUsername(USERNAME)).thenReturn(Optional.of(workload));
@@ -120,8 +134,15 @@ class TrainerWorkloadServiceImplTest {
     }
 
     private TrainerWorkloadUpdate buildUpdate(ActionType actionType) {
-        return new TrainerWorkloadUpdate(USERNAME, "Marcus", "Stone", true,
-                TrainingDate.of(2025, JUNE), 60, actionType);
+        return TrainerWorkloadUpdate.builder()
+                .username(USERNAME)
+                .firstName("Marcus")
+                .lastName("Stone")
+                .isActive(true)
+                .trainingDate(TrainingDate.of(2025, JUNE))
+                .trainingDuration(60)
+                .actionType(actionType)
+                .build();
     }
 
     private TrainerWorkload buildTrainerWorkload(int workingHours) {

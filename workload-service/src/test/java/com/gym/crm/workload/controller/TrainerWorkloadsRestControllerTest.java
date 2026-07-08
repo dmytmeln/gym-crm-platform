@@ -167,13 +167,15 @@ class TrainerWorkloadsRestControllerTest {
     }
 
     private TrainerWorkloadUpdate buildDomainUpdate() {
-        return new TrainerWorkloadUpdate(USERNAME,
-                FIRST_NAME,
-                LAST_NAME,
-                true,
-                TrainingDate.of(2025, JULY),
-                60,
-                ActionType.ADD);
+        return TrainerWorkloadUpdate.builder()
+                .username(USERNAME)
+                .firstName(FIRST_NAME)
+                .lastName(LAST_NAME)
+                .isActive(true)
+                .trainingDate(TrainingDate.of(2025, JULY))
+                .trainingDuration(60)
+                .actionType(ActionType.ADD)
+                .build();
     }
 
 }

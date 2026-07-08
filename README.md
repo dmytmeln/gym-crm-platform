@@ -16,7 +16,7 @@
 * Git (2.40+)
 * JDK 21
 * Apache Maven (3.8+)
-* Docker (Required for running integration tests via Testcontainers, or optionally for running MySQL, Redis, and ActiveMQ)
+* Docker (Required for running integration tests via Testcontainers, or optionally for running required infrastructure services)
 
 ## Quick Start Guide
 
@@ -59,8 +59,7 @@ docker run --name gym-activemq -p 61616:61616 -p 8161:8161 -d rmohr/activemq
 
 Optional web console: [http://localhost:8161](http://localhost:8161)
 
-If your broker credentials differ from the local profile defaults above, override service credentials at startup via
-`SPRING_ACTIVEMQ_USER` / `SPRING_ACTIVEMQ_PASSWORD` or equivalent Spring Boot arguments or change ActiveMQ admin user and admin password.
+If your broker credentials differ, override via `SPRING_ACTIVEMQ_USER` / `SPRING_ACTIVEMQ_PASSWORD` environment variables.
 
 ### Step 4: Run the Services
 

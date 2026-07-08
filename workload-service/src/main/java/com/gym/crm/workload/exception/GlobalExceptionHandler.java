@@ -1,8 +1,11 @@
 package com.gym.crm.workload.exception;
 
 import com.gia.openapi.model.ErrorResponse;
+import com.gym.crm.workload.util.ValidationUtils;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +17,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import static com.gym.crm.workload.exception.ApiError.DATABASE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.SERVICE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.VALIDATION_ERROR;
+import static com.gym.crm.workload.util.ValidationUtils.DEFAULT_DELIMITER;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 
@@ -33,6 +38,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(SERVICE_ERROR.getStatus()).body(body);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+        String violations = ValidationUtils.formatViolations(ex);
+
+        String message = format(RESPONSE_MESSAGE_TEMPLATE, VALIDATION_ERROR.getMessage(), violations);
+        ErrorResponse body = new ErrorResponse(VALIDATION_ERROR.getCode(), message);
+
+        log.warn("Constraint validation failed: {}", ex.getMessage());
+        return ResponseEntity.status(VALIDATION_ERROR.getStatus()).body(body);
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDatabaseException(DataAccessException ex) {
+        log.error("Database/MongoDB error occurred", ex);
+
+        ErrorResponse body = new ErrorResponse(DATABASE_ERROR.getCode(), DATABASE_ERROR.getMessage());
+        return ResponseEntity.status(DATABASE_ERROR.getStatus()).body(body);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex,
                                                                   @NonNull HttpHeaders headers,
@@ -40,7 +64,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull WebRequest request) {
         String violations = ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> format(RESPONSE_MESSAGE_TEMPLATE, fieldError.getField(), fieldError.getDefaultMessage()))
-                .collect(joining(", "));
+                .collect(joining(DEFAULT_DELIMITER));
 
         String message = format(RESPONSE_MESSAGE_TEMPLATE, VALIDATION_ERROR.getMessage(), violations);
         ErrorResponse body = new ErrorResponse(VALIDATION_ERROR.getCode(), message);
