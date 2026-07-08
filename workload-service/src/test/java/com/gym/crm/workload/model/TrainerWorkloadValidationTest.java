@@ -53,11 +53,9 @@ class TrainerWorkloadValidationTest {
         YearSummary invalidYear = firstYear.toBuilder()
                 .year(1899)
                 .build();
-
         MonthSummary invalidMonth = firstMonth.toBuilder()
                 .workingHours(-10)
                 .build();
-
         YearSummary yearWithInvalidMonth = firstYear.toBuilder()
                 .months(List.of(invalidMonth))
                 .build();
