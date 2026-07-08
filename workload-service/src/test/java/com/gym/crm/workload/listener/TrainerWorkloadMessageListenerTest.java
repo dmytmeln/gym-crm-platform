@@ -9,6 +9,9 @@ import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
 import com.gym.crm.workload.service.TrainerWorkloadDeadLetterQueuePublisher;
 import com.gym.crm.workload.service.TrainerWorkloadMessageValidator;
 import com.gym.crm.workload.service.TrainerWorkloadService;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,18 +19,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
+import org.springframework.dao.NonTransientDataAccessException;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.jms.JmsException;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
 import static com.gym.crm.workload.contract.WorkloadActionType.ADD;
 import static java.time.Month.JUNE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -159,6 +168,68 @@ class TrainerWorkloadMessageListenerTest {
         assertThat(MDC.get(TRANSACTION_ID)).isNull();
     }
 
+    @Test
+    void shouldSendNonRecoverableConstraintViolationExceptionToDeadLetterQueue() {
+        TrainerWorkloadUpdateMessage message = buildMessage();
+        TrainerWorkloadUpdate domainUpdate = buildDomainUpdate();
+        ConstraintViolationException mockException = mock(ConstraintViolationException.class);
+        @SuppressWarnings("unchecked")
+        ConstraintViolation<Object> violation = mock(ConstraintViolation.class);
+        Path path = mock(Path.class);
+
+        when(path.toString()).thenReturn("username");
+        when(violation.getPropertyPath()).thenReturn(path);
+        when(violation.getMessage()).thenReturn("must not be blank");
+        when(mockException.getConstraintViolations()).thenReturn(Set.of(violation));
+        when(mapper.toDomainUpdate(message)).thenReturn(domainUpdate);
+        when(messageValidator.validate(message)).thenReturn(Optional.empty());
+        doThrow(mockException).when(service).updateWorkload(domainUpdate);
+
+        listener.receiveMessage(message, TRANSACTION_ID_VALUE);
+
+        verify(service).updateWorkload(domainUpdate);
+        verify(deadLetterQueuePublisher).publish(message, "username: must not be blank", TRANSACTION_ID_VALUE);
+        assertThat(MDC.get(TRANSACTION_ID)).isNull();
+    }
+
+    @Test
+    void shouldSendNonRecoverableDataAccessExceptionToDeadLetterQueue() {
+        TrainerWorkloadUpdateMessage message = buildMessage();
+        TrainerWorkloadUpdate domainUpdate = buildDomainUpdate();
+        NonTransientDataAccessException mockException = mock(NonTransientDataAccessException.class);
+
+        when(mockException.getMessage()).thenReturn("non-transient database error");
+        when(mapper.toDomainUpdate(message)).thenReturn(domainUpdate);
+        when(messageValidator.validate(message)).thenReturn(Optional.empty());
+        doThrow(mockException).when(service).updateWorkload(domainUpdate);
+
+        listener.receiveMessage(message, TRANSACTION_ID_VALUE);
+
+        verify(service).updateWorkload(domainUpdate);
+        verify(deadLetterQueuePublisher).publish(message, "non-transient database error", TRANSACTION_ID_VALUE);
+        assertThat(MDC.get(TRANSACTION_ID)).isNull();
+    }
+
+    @Test
+    void shouldPropagateRecoverableDataAccessException() {
+        TrainerWorkloadUpdateMessage message = buildMessage();
+        TrainerWorkloadUpdate domainUpdate = buildDomainUpdate();
+        TransientDataAccessException mockException = mock(TransientDataAccessException.class);
+
+        when(mapper.toDomainUpdate(message)).thenReturn(domainUpdate);
+        when(messageValidator.validate(message)).thenReturn(Optional.empty());
+        doThrow(mockException).when(service).updateWorkload(domainUpdate);
+
+        Throwable actualThrowable = catchThrowable(() -> listener.receiveMessage(message, TRANSACTION_ID_VALUE));
+
+        assertThat(actualThrowable).isInstanceOf(TrainerWorkloadProcessingException.class);
+        TrainerWorkloadProcessingException actual = (TrainerWorkloadProcessingException) actualThrowable;
+        assertThat(actual.getCause()).isSameAs(mockException);
+        verify(service).updateWorkload(domainUpdate);
+        verify(deadLetterQueuePublisher, never()).publish(eq(message), any(), eq(TRANSACTION_ID_VALUE));
+        assertThat(MDC.get(TRANSACTION_ID)).isNull();
+    }
+
     private TrainerWorkloadUpdateMessage buildMessage() {
         return TrainerWorkloadUpdateMessage.builder()
                 .username(TRAINER_USERNAME)
@@ -172,13 +243,15 @@ class TrainerWorkloadMessageListenerTest {
     }
 
     private TrainerWorkloadUpdate buildDomainUpdate() {
-        return new TrainerWorkloadUpdate(TRAINER_USERNAME,
-                "Liam",
-                "Miller",
-                true,
-                TrainingDate.of(2026, JUNE),
-                60,
-                ActionType.ADD);
+        return TrainerWorkloadUpdate.builder()
+                .username(TRAINER_USERNAME)
+                .firstName("Liam")
+                .lastName("Miller")
+                .isActive(true)
+                .trainingDate(TrainingDate.of(2026, JUNE))
+                .trainingDuration(60)
+                .actionType(ActionType.ADD)
+                .build();
     }
 
 }

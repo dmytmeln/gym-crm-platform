@@ -5,7 +5,9 @@ This microservice handles managing and tracking trainer workloads.
 ## Prerequisites
 
 In addition to the global prerequisites, you will need:
-* ActiveMQ broker or Docker
+* ActiveMQ broker
+* MongoDB instance
+* Or Docker to run both
 
 ## Setup and Running
 
@@ -19,15 +21,38 @@ Local profile defaults to:
 * **Username**: `gym`
 * **Password**: `gym`
 
-If your broker credentials differ from the local profile defaults above, override service credentials at startup via
-`SPRING_ACTIVEMQ_USER` / `SPRING_ACTIVEMQ_PASSWORD` or equivalent Spring Boot arguments or change ActiveMQ admin user and admin password.
+If your broker credentials differ, override via `SPRING_ACTIVEMQ_USER` / `SPRING_ACTIVEMQ_PASSWORD` environment variables.
 
-### Step 2: Run the Application
+### Step 2: Set Up MongoDB
+
+This service persists trainer workload summaries in MongoDB. You can either use a locally installed MongoDB instance or run it using Docker.
+
+#### Option A: Local MongoDB
+Ensure your local MongoDB instance is running, and you have configured the database `gym_workload` with user credentials `gym`/`gym`.
+
+#### Option B: Using Docker
+You can start a MongoDB container with the required database and user setup using this command:
+
+```bash
+docker run --name gym-mongodb -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=gym -e MONGO_INITDB_ROOT_PASSWORD=gym -d mongo:latest
+```
+
+Local profile defaults to:
+
+* **URI**: `mongodb://gym:gym@localhost:27017/gym_workload?authSource=admin`
+* **Username**: `gym`
+* **Password**: `gym`
+
+If your MongoDB credentials or URI differ, override via `SPRING_DATA_MONGODB_URI` environment variable.
+
+
+### Step 3: Run the Application
 
 > [!IMPORTANT]
-> The following service must be running for this service to register and function correctly:
+> The following services must be running for this service to register and function correctly:
 > * **[Discovery Server](../discovery-server/README.md)**: Service registry required for Eureka registration.
 > * **ActiveMQ broker**: Required for JMS message consumption.
+> * **MongoDB**: Required for workload data persistence.
 
 You can run the workload service using Maven from the service directory or from the root:
 

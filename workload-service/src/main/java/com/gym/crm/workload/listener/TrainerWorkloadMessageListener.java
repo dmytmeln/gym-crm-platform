@@ -8,9 +8,12 @@ import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
 import com.gym.crm.workload.service.TrainerWorkloadDeadLetterQueuePublisher;
 import com.gym.crm.workload.service.TrainerWorkloadMessageValidator;
 import com.gym.crm.workload.service.TrainerWorkloadService;
+import com.gym.crm.workload.util.ValidationUtils;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.handler.annotation.Header;
@@ -69,9 +72,19 @@ public class TrainerWorkloadMessageListener {
         try {
             TrainerWorkloadUpdate domainUpdate = mapper.toDomainUpdate(message);
             service.updateWorkload(domainUpdate);
+        } catch (ConstraintViolationException exception) {
+            String failureReason = ValidationUtils.formatViolations(exception);
+            logDatabaseErrorAndPublishDlq(message, resolvedTransactionId, failureReason);
+        } catch (NonTransientDataAccessException exception) {
+            logDatabaseErrorAndPublishDlq(message, resolvedTransactionId, exception.getMessage());
         } catch (RuntimeException exception) {
             throw new TrainerWorkloadProcessingException(resolvedTransactionId, message.username(), message.actionType(), exception);
         }
+    }
+
+    private void logDatabaseErrorAndPublishDlq(TrainerWorkloadUpdateMessage message, String resolvedTransactionId, String failureReason) {
+        log.warn("Non-recoverable database error occurred, sending message to DLQ: {}", failureReason);
+        publishDeadLetterQueueMessage(message, resolvedTransactionId, failureReason);
     }
 
 }

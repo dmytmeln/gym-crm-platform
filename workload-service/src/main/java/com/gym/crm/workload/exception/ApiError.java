@@ -12,7 +12,8 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 public enum ApiError {
 
     VALIDATION_ERROR(2760, "Validation error", BAD_REQUEST),
-    SERVICE_ERROR(3200, "Internal processing error", INTERNAL_SERVER_ERROR);
+    SERVICE_ERROR(3200, "Internal processing error", INTERNAL_SERVER_ERROR),
+    DATABASE_ERROR(3358, "Database error", INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;

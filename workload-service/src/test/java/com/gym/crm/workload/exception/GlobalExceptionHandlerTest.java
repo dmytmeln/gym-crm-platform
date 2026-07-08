@@ -1,8 +1,12 @@
 package com.gym.crm.workload.exception;
 
 import com.gia.openapi.model.ErrorResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -12,7 +16,9 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
+import java.util.Set;
 
+import static com.gym.crm.workload.exception.ApiError.DATABASE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.SERVICE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.VALIDATION_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,6 +96,39 @@ class GlobalExceptionHandlerTest {
         assertThat(body).isNotNull();
         assertThat(body.getErrorCode()).isEqualTo(VALIDATION_ERROR.getCode());
         assertThat(body.getErrorMessage()).isEqualTo(exception.getMessage());
+    }
+
+    @Test
+    void shouldHandleConstraintViolationException() {
+        ConstraintViolationException exception = mock(ConstraintViolationException.class);
+        @SuppressWarnings("unchecked")
+        ConstraintViolation<Object> violation = mock(ConstraintViolation.class);
+        Path path = mock(Path.class);
+
+        when(path.toString()).thenReturn("username");
+        when(violation.getPropertyPath()).thenReturn(path);
+        when(violation.getMessage()).thenReturn("must not be blank");
+        when(exception.getConstraintViolations()).thenReturn(Set.of(violation));
+        when(exception.getMessage()).thenReturn("Validation failed");
+
+        ResponseEntity<ErrorResponse> result = handler.handleConstraintViolationException(exception);
+
+        assertThat(result.getStatusCode()).isEqualTo(VALIDATION_ERROR.getStatus());
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getErrorCode()).isEqualTo(VALIDATION_ERROR.getCode());
+        assertThat(result.getBody().getErrorMessage()).isEqualTo("Validation error: username: must not be blank");
+    }
+
+    @Test
+    void shouldHandleDataAccessException() {
+        DataAccessException exception = mock(DataAccessException.class);
+
+        ResponseEntity<ErrorResponse> result = handler.handleDatabaseException(exception);
+
+        assertThat(result.getStatusCode()).isEqualTo(DATABASE_ERROR.getStatus());
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getErrorCode()).isEqualTo(DATABASE_ERROR.getCode());
+        assertThat(result.getBody().getErrorMessage()).isEqualTo(DATABASE_ERROR.getMessage());
     }
 
 }
