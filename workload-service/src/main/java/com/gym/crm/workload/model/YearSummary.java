@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +22,13 @@ import static org.springframework.data.mongodb.core.mapping.Field.Write.NON_NULL
 public class YearSummary {
 
     @Field(name = "year", write = NON_NULL)
+    @NotNull
+    @Min(1900)
     private final Integer year;
 
     @Field(name = "months", write = NON_NULL)
+    @NotNull
+    @Valid
     private final List<MonthSummary> months;
 
     public static YearSummary of(TrainingDate date, int duration) {

@@ -9,6 +9,9 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +27,24 @@ public class TrainerWorkload {
 
     @Id
     @Field(name = "_id", write = NON_NULL)
+    @NotBlank
     private final String username;
 
     @Field(name = "first_name", write = NON_NULL)
+    @NotBlank
     private final String firstName;
 
     @Field(name = "last_name", write = NON_NULL)
+    @NotBlank
     private final String lastName;
 
     @Field(name = "is_active", write = NON_NULL)
+    @NotNull
     private final Boolean isActive;
 
     @Field(name = "years", write = NON_NULL)
+    @NotNull
+    @Valid
     private final List<YearSummary> years;
 
     public TrainerWorkload increaseWorkingHours(TrainingDate trainingDate, int duration) {
