@@ -7,9 +7,11 @@ import com.gym.crm.workload.model.TrainerWorkload;
 import com.gym.crm.workload.model.YearSummary;
 import com.gym.crm.workload.repository.TrainerWorkloadRepository;
 import com.gym.crm.workload.service.TrainerWorkloadService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Month;
 import java.util.List;
@@ -20,6 +22,7 @@ import static com.gym.crm.workload.dto.ActionType.DELETE;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class TrainerWorkloadServiceImpl implements TrainerWorkloadService {
 
     private final TrainerWorkloadRepository repository;
@@ -36,7 +39,7 @@ public class TrainerWorkloadServiceImpl implements TrainerWorkloadService {
     }
 
     @Override
-    public void updateWorkload(TrainerWorkloadUpdate update) {
+    public void updateWorkload(@Valid TrainerWorkloadUpdate update) {
         log.info("Updating workload for trainer: {}, action: {}, duration: {} min", update.username(), update.actionType(), update.trainingDuration());
         Optional<TrainerWorkload> workloadOpt = repository.findByUsername(update.username());
 
