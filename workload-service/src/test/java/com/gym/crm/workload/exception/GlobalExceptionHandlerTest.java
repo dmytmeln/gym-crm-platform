@@ -1,10 +1,13 @@
 package com.gym.crm.workload.exception;
 
 import com.gia.openapi.model.ErrorResponse;
-import jakarta.validation.ConstraintViolation;
+import com.gym.crm.workload.service.common.ValidationErrorFormatter;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Path;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +19,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.gym.crm.workload.exception.ApiError.DATABASE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.SERVICE_ERROR;
@@ -26,9 +28,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+@ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
-    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
+    @Mock
+    private ValidationErrorFormatter validationErrorFormatter;
+
+    @InjectMocks
+    private GlobalExceptionHandler handler;
 
     @Test
     void shouldHandleUnexpectedException() {
@@ -66,8 +73,7 @@ class GlobalExceptionHandlerTest {
     void shouldHandleMissingServletRequestParameter() {
         MissingServletRequestParameterException exception = new MissingServletRequestParameterException("year", "Integer");
 
-        ResponseEntity<Object> result = handler.handleMissingServletRequestParameter(
-                exception,
+        ResponseEntity<Object> result = handler.handleMissingServletRequestParameter(exception,
                 new HttpHeaders(),
                 BAD_REQUEST,
                 mock(WebRequest.class));
@@ -101,15 +107,9 @@ class GlobalExceptionHandlerTest {
     @Test
     void shouldHandleConstraintViolationException() {
         ConstraintViolationException exception = mock(ConstraintViolationException.class);
-        @SuppressWarnings("unchecked")
-        ConstraintViolation<Object> violation = mock(ConstraintViolation.class);
-        Path path = mock(Path.class);
 
-        when(path.toString()).thenReturn("username");
-        when(violation.getPropertyPath()).thenReturn(path);
-        when(violation.getMessage()).thenReturn("must not be blank");
-        when(exception.getConstraintViolations()).thenReturn(Set.of(violation));
         when(exception.getMessage()).thenReturn("Validation failed");
+        when(validationErrorFormatter.formatViolations(exception)).thenReturn("username: must not be blank");
 
         ResponseEntity<ErrorResponse> result = handler.handleConstraintViolationException(exception);
 

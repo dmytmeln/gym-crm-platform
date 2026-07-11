@@ -11,6 +11,7 @@ import com.gym.crm.workload.dto.TrainingDate;
 import com.gym.crm.workload.dto.TrainerWorkloadSearchFilter;
 import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
 import com.gym.crm.workload.service.TrainerWorkloadService;
+import com.gym.crm.workload.service.common.ValidationErrorFormatter;
 import com.gym.crm.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TrainerWorkloadsRestController.class)
-@Import({SecurityConfig.class, LoggingConfig.class})
+@Import({SecurityConfig.class, LoggingConfig.class, ValidationErrorFormatter.class})
 @WithMockUser
 class TrainerWorkloadsRestControllerTest {
 

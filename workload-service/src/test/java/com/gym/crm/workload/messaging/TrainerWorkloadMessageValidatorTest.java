@@ -1,6 +1,7 @@
-package com.gym.crm.workload.service;
+package com.gym.crm.workload.messaging;
 
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
+import com.gym.crm.workload.service.common.ValidationErrorFormatter;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -30,7 +31,8 @@ class TrainerWorkloadMessageValidatorTest {
 
     @BeforeEach
     void init() {
-        messageValidator = new TrainerWorkloadMessageValidator(validator);
+        ValidationErrorFormatter validationErrorFormatter = new ValidationErrorFormatter();
+        messageValidator = new TrainerWorkloadMessageValidator(validator, validationErrorFormatter);
     }
 
     @Test

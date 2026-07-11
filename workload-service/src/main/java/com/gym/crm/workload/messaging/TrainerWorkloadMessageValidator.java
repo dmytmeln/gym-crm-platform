@@ -1,7 +1,7 @@
-package com.gym.crm.workload.service;
+package com.gym.crm.workload.messaging;
 
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
-import com.gym.crm.workload.util.ValidationUtils;
+import com.gym.crm.workload.service.common.ValidationErrorFormatter;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ public class TrainerWorkloadMessageValidator {
     private static final String VIOLATION_DELIMITER = "; ";
 
     private final Validator validator;
+    private final ValidationErrorFormatter validationErrorFormatter;
 
     public Optional<String> validate(TrainerWorkloadUpdateMessage message) {
         Set<ConstraintViolation<TrainerWorkloadUpdateMessage>> constraintViolations = validator.validate(message);
@@ -25,7 +26,7 @@ public class TrainerWorkloadMessageValidator {
             return Optional.empty();
         }
 
-        String formattedViolations = ValidationUtils.formatViolations(constraintViolations, VIOLATION_DELIMITER);
+        String formattedViolations = validationErrorFormatter.formatViolations(constraintViolations, VIOLATION_DELIMITER);
 
         return Optional.of(formattedViolations);
     }

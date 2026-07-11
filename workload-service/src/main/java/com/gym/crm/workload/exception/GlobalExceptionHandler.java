@@ -1,8 +1,9 @@
 package com.gym.crm.workload.exception;
 
 import com.gia.openapi.model.ErrorResponse;
-import com.gym.crm.workload.util.ValidationUtils;
+import com.gym.crm.workload.service.common.ValidationErrorFormatter;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataAccessException;
@@ -20,15 +21,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import static com.gym.crm.workload.exception.ApiError.DATABASE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.SERVICE_ERROR;
 import static com.gym.crm.workload.exception.ApiError.VALIDATION_ERROR;
-import static com.gym.crm.workload.util.ValidationUtils.DEFAULT_DELIMITER;
+import static com.gym.crm.workload.service.common.ValidationErrorFormatter.DEFAULT_DELIMITER;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String RESPONSE_MESSAGE_TEMPLATE = "%s: %s";
+
+    private final ValidationErrorFormatter validationErrorFormatter;
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception ex) {
@@ -40,7 +44,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
-        String violations = ValidationUtils.formatViolations(ex);
+        String violations = validationErrorFormatter.formatViolations(ex);
 
         String message = format(RESPONSE_MESSAGE_TEMPLATE, VALIDATION_ERROR.getMessage(), violations);
         ErrorResponse body = new ErrorResponse(VALIDATION_ERROR.getCode(), message);
