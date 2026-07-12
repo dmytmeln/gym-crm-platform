@@ -6,7 +6,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.gym.crm.workload.config.MongoContainerTestConfig;
 import com.gym.crm.workload.contract.TrainerWorkloadDeadLetterMessage;
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
-import com.gym.crm.workload.listener.TrainerWorkloadDeadLetterQueueListener;
+import com.gym.crm.workload.messaging.TrainerWorkloadDeadLetterQueueListener;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

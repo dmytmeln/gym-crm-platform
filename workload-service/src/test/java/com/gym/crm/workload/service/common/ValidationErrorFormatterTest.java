@@ -1,4 +1,4 @@
-package com.gym.crm.workload.util;
+package com.gym.crm.workload.service.common;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -11,7 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ValidationUtilsTest {
+class ValidationErrorFormatterTest {
+
+    private final ValidationErrorFormatter validationErrorFormatter = new ValidationErrorFormatter();
 
     @Test
     void shouldFormatViolationsWithGivenDelimiter() {
@@ -29,7 +31,7 @@ class ValidationUtilsTest {
         when(violation2.getPropertyPath()).thenReturn(path2);
         when(violation2.getMessage()).thenReturn("must be positive");
 
-        String result = ValidationUtils.formatViolations(Set.of(violation1, violation2), "; ");
+        String result = validationErrorFormatter.formatViolations(Set.of(violation1, violation2), "; ");
 
         assertThat(result).isEqualTo("trainingDuration: must be positive; username: must not be blank");
     }
@@ -46,7 +48,7 @@ class ValidationUtilsTest {
         when(violation.getMessage()).thenReturn("must not be blank");
         when(exception.getConstraintViolations()).thenReturn(Set.of(violation));
 
-        String result = ValidationUtils.formatViolations(exception);
+        String result = validationErrorFormatter.formatViolations(exception);
 
         assertThat(result).isEqualTo("username: must not be blank");
     }

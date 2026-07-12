@@ -1,4 +1,4 @@
-package com.gym.crm.workload.service;
+package com.gym.crm.workload.messaging;
 
 import com.gym.crm.workload.contract.TrainerWorkloadDeadLetterMessage;
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;

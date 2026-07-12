@@ -1,4 +1,4 @@
-package com.gym.crm.workload.listener;
+package com.gym.crm.workload.messaging;
 
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
 import com.gym.crm.workload.dto.ActionType;
@@ -6,12 +6,9 @@ import com.gym.crm.workload.dto.TrainerWorkloadUpdate;
 import com.gym.crm.workload.dto.TrainingDate;
 import com.gym.crm.workload.exception.TrainerWorkloadProcessingException;
 import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
-import com.gym.crm.workload.service.TrainerWorkloadDeadLetterQueuePublisher;
-import com.gym.crm.workload.service.TrainerWorkloadMessageValidator;
 import com.gym.crm.workload.service.TrainerWorkloadService;
-import jakarta.validation.ConstraintViolation;
+import com.gym.crm.workload.service.common.ValidationErrorFormatter;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,7 +22,6 @@ import org.springframework.jms.JmsException;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.gym.crm.logging.TransactionContext.TRANSACTION_ID;
 import static com.gym.crm.workload.contract.WorkloadActionType.ADD;
@@ -62,6 +58,9 @@ class TrainerWorkloadMessageListenerTest {
 
     @Mock
     private TrainerWorkloadMessageValidator messageValidator;
+
+    @Mock
+    private ValidationErrorFormatter validationErrorFormatter;
 
     @InjectMocks
     private TrainerWorkloadMessageListener listener;
@@ -173,14 +172,8 @@ class TrainerWorkloadMessageListenerTest {
         TrainerWorkloadUpdateMessage message = buildMessage();
         TrainerWorkloadUpdate domainUpdate = buildDomainUpdate();
         ConstraintViolationException mockException = mock(ConstraintViolationException.class);
-        @SuppressWarnings("unchecked")
-        ConstraintViolation<Object> violation = mock(ConstraintViolation.class);
-        Path path = mock(Path.class);
 
-        when(path.toString()).thenReturn("username");
-        when(violation.getPropertyPath()).thenReturn(path);
-        when(violation.getMessage()).thenReturn("must not be blank");
-        when(mockException.getConstraintViolations()).thenReturn(Set.of(violation));
+        when(validationErrorFormatter.formatViolations(mockException)).thenReturn("username: must not be blank");
         when(mapper.toDomainUpdate(message)).thenReturn(domainUpdate);
         when(messageValidator.validate(message)).thenReturn(Optional.empty());
         doThrow(mockException).when(service).updateWorkload(domainUpdate);

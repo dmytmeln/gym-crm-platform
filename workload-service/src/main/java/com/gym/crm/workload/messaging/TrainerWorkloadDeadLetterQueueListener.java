@@ -1,4 +1,4 @@
-package com.gym.crm.workload.listener;
+package com.gym.crm.workload.messaging;
 
 import com.gym.crm.logging.TransactionContext;
 import com.gym.crm.workload.contract.TrainerWorkloadDeadLetterMessage;

@@ -1,14 +1,12 @@
-package com.gym.crm.workload.listener;
+package com.gym.crm.workload.messaging;
 
 import com.gym.crm.logging.TransactionContext;
 import com.gym.crm.workload.contract.TrainerWorkloadUpdateMessage;
 import com.gym.crm.workload.dto.TrainerWorkloadUpdate;
 import com.gym.crm.workload.exception.TrainerWorkloadProcessingException;
 import com.gym.crm.workload.mapper.TrainerWorkloadMapper;
-import com.gym.crm.workload.service.TrainerWorkloadDeadLetterQueuePublisher;
-import com.gym.crm.workload.service.TrainerWorkloadMessageValidator;
 import com.gym.crm.workload.service.TrainerWorkloadService;
-import com.gym.crm.workload.util.ValidationUtils;
+import com.gym.crm.workload.service.common.ValidationErrorFormatter;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +30,7 @@ public class TrainerWorkloadMessageListener {
     private final TrainerWorkloadMessageValidator messageValidator;
     private final TrainerWorkloadService service;
     private final TrainerWorkloadMapper mapper;
+    private final ValidationErrorFormatter validationErrorFormatter;
 
     @JmsListener(destination = "${app.jms.queues.trainer-workload}")
     public void receiveMessage(TrainerWorkloadUpdateMessage message,
@@ -73,7 +72,7 @@ public class TrainerWorkloadMessageListener {
             TrainerWorkloadUpdate domainUpdate = mapper.toDomainUpdate(message);
             service.updateWorkload(domainUpdate);
         } catch (ConstraintViolationException exception) {
-            String failureReason = ValidationUtils.formatViolations(exception);
+            String failureReason = validationErrorFormatter.formatViolations(exception);
             logDatabaseErrorAndPublishDlq(message, resolvedTransactionId, failureReason);
         } catch (NonTransientDataAccessException exception) {
             logDatabaseErrorAndPublishDlq(message, resolvedTransactionId, exception.getMessage());
