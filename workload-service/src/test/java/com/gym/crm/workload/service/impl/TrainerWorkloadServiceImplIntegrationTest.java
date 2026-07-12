@@ -10,8 +10,11 @@ import com.gym.crm.workload.model.TrainerWorkload;
 import com.gym.crm.workload.model.YearSummary;
 import com.gym.crm.workload.repository.TrainerWorkloadRepository;
 import com.gym.crm.workload.service.TrainerWorkloadService;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
@@ -28,9 +31,11 @@ import static com.gym.crm.workload.dto.ActionType.DELETE;
 import static java.time.Month.JULY;
 import static java.time.Month.JUNE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataMongoTest
 @ActiveProfiles("test")
+@ImportAutoConfiguration(ValidationAutoConfiguration.class)
 @Import(TrainerWorkloadServiceImpl.class)
 class TrainerWorkloadServiceImplIntegrationTest {
 
@@ -78,6 +83,17 @@ class TrainerWorkloadServiceImplIntegrationTest {
 
         Optional<TrainerWorkload> actual = repository.findByUsername(USERNAME);
         assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void shouldRejectInvalidUpdateBeforeProcessing() {
+        TrainerWorkloadUpdate update = buildUpdate(TrainingDate.of(2025, JUNE), -1, ADD);
+
+        assertThatThrownBy(() -> service.updateWorkload(update))
+                .isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("Training duration must not be negative");
+
+        assertThat(repository.findByUsername(USERNAME)).isEmpty();
     }
 
     @Test
