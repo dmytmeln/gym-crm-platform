@@ -177,6 +177,9 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <image>
+                        <name>${gymCore.image}</name>
+                    </image>
                 </configuration>
             </plugin>
             <plugin>
