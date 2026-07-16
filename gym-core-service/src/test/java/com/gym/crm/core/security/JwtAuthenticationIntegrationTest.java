@@ -53,6 +53,7 @@ class JwtAuthenticationIntegrationTest {
     private static final String PASSWORD_ENDPOINT = BASE_PATH + "/auth/password";
     private static final String TRAININGS_ENDPOINT = BASE_PATH + "/trainings";
     private static final String TRAINING_TYPES_ENDPOINT = TRAININGS_ENDPOINT + "/types";
+    private static final String HEALTH_ENDPOINT = "/actuator/health";
     private static final String TRAINEE_RESOURCE_ENDPOINT = BASE_PATH + "/trainees/{username}";
     private static final String TRAINER_RESOURCE_ENDPOINT = BASE_PATH + "/trainers/{username}";
     private static final String EXISTING_TRAINEE_USERNAME = "liam.miller";
@@ -159,6 +160,13 @@ class JwtAuthenticationIntegrationTest {
                 .isNotNull()
                 .hasSize(1)
                 .containsExactly("Bearer");
+    }
+
+    @Test
+    void shouldAccessHealthEndpointWithoutToken() {
+        ResponseEntity<Void> actual = restTemplate.getForEntity(HEALTH_ENDPOINT, Void.class);
+
+        assertThat(actual.getStatusCode().is2xxSuccessful()).isTrue();
     }
 
     @Test
