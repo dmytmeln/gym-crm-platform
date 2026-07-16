@@ -13,5 +13,5 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @SelectClasspathResource("features/gym-core-service")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.gym.crm.bdd")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty,summary")
-public class GymCoreComponentIT {
+public class GymCoreComponentTestRunner {
 }

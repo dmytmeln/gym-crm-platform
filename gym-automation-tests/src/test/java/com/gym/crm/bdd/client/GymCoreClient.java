@@ -1,7 +1,8 @@
 package com.gym.crm.bdd.client;
 
+import com.gym.crm.bdd.model.CreateTraineeRequest;
+import com.gym.crm.bdd.model.CreateTrainerRequest;
 import com.gym.crm.bdd.support.GymCoreComponentStack;
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.NoArgsConstructor;
@@ -22,33 +23,18 @@ public class GymCoreClient {
     private static final String AUTH_BASE = "/auth";
     private static final String TRAININGS_BASE = "/trainings";
 
-    public Map<String, String> registerTrainer(String firstName, String lastName) {
+    public Response registerTrainer(CreateTrainerRequest request) {
         return request()
                 .contentType(JSON)
-                .body(Map.of("firstName", firstName,
-                        "lastName", lastName,
-                        "specialization", "CARDIO"))
-                .post(TRAINERS_BASE + "/register")
-                .then()
-                .statusCode(HTTP_OK)
-                .extract()
-                .body()
-                .as(new TypeRef<>() {});
+                .body(request)
+                .post(TRAINERS_BASE + "/register");
     }
 
-    public Map<String, String> registerTrainee(String firstName, String lastName) {
+    public Response registerTrainee(CreateTraineeRequest request) {
         return request()
                 .contentType(JSON)
-                .body(Map.of("firstName", firstName,
-                        "lastName", lastName,
-                        "dateOfBirth", "1995-05-10",
-                        "address", "Test Street"))
-                .post(TRAINEES_BASE + "/register")
-                .then()
-                .statusCode(HTTP_OK)
-                .extract()
-                .body()
-                .as(new TypeRef<>() {});
+                .body(request)
+                .post(TRAINEES_BASE + "/register");
     }
 
     public String login(String username, String password) {

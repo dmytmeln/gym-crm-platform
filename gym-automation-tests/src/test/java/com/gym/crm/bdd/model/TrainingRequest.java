@@ -27,12 +27,13 @@ public final class TrainingRequest {
 
     public static TrainingRequest valid(String traineeUsername,
                                         String trainerUsername,
+                                        String trainingName,
                                         LocalDate trainingDate,
                                         int trainingDuration) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put(TRAINEE_USERNAME, traineeUsername);
         body.put(TRAINER_USERNAME, trainerUsername);
-        body.put(TRAINING_NAME, "Component Training");
+        body.put(TRAINING_NAME, trainingName);
         body.put(TRAINING_DATE, trainingDate.toString());
         body.put(TRAINING_DURATION, trainingDuration);
 
@@ -65,6 +66,18 @@ public final class TrainingRequest {
 
     public void setDuration(int duration) {
         body.put(TRAINING_DURATION, duration);
+    }
+
+    public String name() {
+        return body.path(TRAINING_NAME).asText();
+    }
+
+    public String date() {
+        return body.path(TRAINING_DATE).asText();
+    }
+
+    public int duration() {
+        return body.path(TRAINING_DURATION).asInt();
     }
 
     public ObjectNode body() {

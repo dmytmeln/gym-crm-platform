@@ -26,7 +26,6 @@ public final class GymCoreComponentStack {
     private static final int ACTIVEMQ_WEB_PORT = 8161;
     private static final int GYM_CORE_PORT = 8082;
     private static final int HTTP_OK = 200;
-    private static final int HTTP_FOUND = 302;
     private static final int STARTUP_TIMEOUT_MINUTES = 3;
     private static final String MYSQL_DB = "gym_db";
     private static final String MYSQL_USER = "gym";
@@ -116,7 +115,8 @@ public final class GymCoreComponentStack {
                         .withStrategy(Wait.forListeningPort())
                         .withStrategy(Wait.forHttp("/")
                                 .forPort(ACTIVEMQ_WEB_PORT)
-                                .forStatusCodeMatching(GymCoreComponentStack::isActiveMQReady)));
+                                .withBasicCredentials(ACTIVEMQ_USER, ACTIVEMQ_PASSWORD)
+                                .forStatusCode(HTTP_OK)));
     }
 
     @SuppressWarnings("resource")
@@ -141,17 +141,16 @@ public final class GymCoreComponentStack {
                 entry("SPRING_ACTIVEMQ_USER", ACTIVEMQ_USER),
                 entry("SPRING_ACTIVEMQ_PASSWORD", ACTIVEMQ_PASSWORD),
                 entry("EUREKA_CLIENT_ENABLED", "false"),
+                entry("APP_LOGGING_PATH", "/tmp/logs"),
                 entry("APP_JMS_QUEUES_TRAINER_WORKLOAD", QUEUE));
     }
 
-    private static boolean isActiveMQReady(int statusCode) {
-        return statusCode == HTTP_OK || statusCode == HTTP_FOUND;
-    }
-
     private static void stopContainer(GenericContainer<?> container) {
-        if (container != null) {
-            container.stop();
+        if (container == null) {
+            return;
         }
+
+        container.stop();
     }
 
 }

@@ -23,7 +23,7 @@
         <module>gym-core-service</module>
         <module>workload-service</module>
         <module>workload-contract</module>
-        <module>bdd-tests</module>
+        <module>gym-automation-tests</module>
     </modules>
 
     <properties>

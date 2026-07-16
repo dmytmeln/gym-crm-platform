@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bdd-tests</artifactId>
+    <artifactId>gym-automation-tests</artifactId>
 
     <parent>
         <groupId>com.gym.crm</groupId>
@@ -72,6 +72,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.redis</groupId>
             <artifactId>testcontainers-redis</artifactId>
             <version>2.2.2</version>
@@ -117,6 +122,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <skipITs>${skipITs}</skipITs>
+                    <includes>
+                        <include>**/*TestRunner.java</include>
+                    </includes>
                     <systemPropertyVariables>
                         <gymCore.image>${gymCore.image}</gymCore.image>
                         <cucumber.execution.parallel.enabled>false</cucumber.execution.parallel.enabled>

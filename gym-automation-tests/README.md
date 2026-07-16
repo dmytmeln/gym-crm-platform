@@ -55,7 +55,7 @@ mvn spring-boot:build-image -pl gym-core-service `
 Use the same property when running tests against an overridden image:
 
 ```powershell
-mvn verify -pl bdd-tests "-DskipITs=false" `
+mvn verify -pl gym-automation-tests "-DskipITs=false" `
   "-DgymCore.image=gym-core-service:abc123"
 ```
 
@@ -64,7 +64,7 @@ mvn verify -pl bdd-tests "-DskipITs=false" `
 Run every BDD scenario:
 
 ```powershell
-mvn verify -pl bdd-tests "-DskipITs=false"
+mvn verify -pl gym-automation-tests "-DskipITs=false"
 ```
 
 Component tests are disabled by default through `skipITs=true`. Enable them explicitly with `-DskipITs=false`.
@@ -75,18 +75,18 @@ mvn test
 mvn verify
 ```
 
-Surefire excludes `*IT` classes. Failsafe executes them during `integration-test` and checks their results during
-`verify`.
+Surefire excludes `*Runner` classes by default. Failsafe is configured to execute `GymCoreComponentTestRunner` (matching `*TestRunner`) during
+`integration-test` and check its results during `verify`.
 
 ## Focused execution
 
 Use Cucumber tags to run a subset:
 
 ```powershell
-mvn verify -pl bdd-tests "-DskipITs=false" "-Dcucumber.filter.tags=@happy-path"
-mvn verify -pl bdd-tests "-DskipITs=false" "-Dcucumber.filter.tags=@authn"
-mvn verify -pl bdd-tests "-DskipITs=false" "-Dcucumber.filter.tags=@authz"
-mvn verify -pl bdd-tests "-DskipITs=false" "-Dcucumber.filter.tags=@validation"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@happy-path"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@authn"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@authz"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@validation"
 ```
 
 Without `cucumber.filter.tags`, all scenarios selected by the runner execute.
