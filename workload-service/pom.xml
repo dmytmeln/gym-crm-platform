@@ -126,6 +126,9 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <image>
+                        <name>${workload.image}</name>
+                    </image>
                 </configuration>
             </plugin>
             <plugin>

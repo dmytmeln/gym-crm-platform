@@ -1,4 +1,4 @@
-package com.gym.crm.bdd.model;
+package com.gym.crm.bdd.gymcore.model;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;

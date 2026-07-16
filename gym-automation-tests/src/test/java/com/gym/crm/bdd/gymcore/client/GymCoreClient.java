@@ -1,8 +1,8 @@
-package com.gym.crm.bdd.client;
+package com.gym.crm.bdd.gymcore.client;
 
-import com.gym.crm.bdd.model.CreateTraineeRequest;
-import com.gym.crm.bdd.model.CreateTrainerRequest;
-import com.gym.crm.bdd.support.GymCoreComponentStack;
+import com.gym.crm.bdd.gymcore.model.CreateTraineeRequest;
+import com.gym.crm.bdd.gymcore.model.CreateTrainerRequest;
+import com.gym.crm.bdd.gymcore.support.GymCoreComponentStack;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.NoArgsConstructor;

@@ -1,13 +1,13 @@
-package com.gym.crm.bdd.hooks;
+package com.gym.crm.bdd.gymcore.hooks;
 
-import com.gym.crm.bdd.support.GymCoreComponentStack;
+import com.gym.crm.bdd.gymcore.support.GymCoreComponentStack;
 import io.cucumber.java.AfterAll;
-import io.cucumber.java.BeforeAll;
+import io.cucumber.java.Before;
 
 public class GymCoreComponentHooks {
 
-    @BeforeAll
-    public static void startStack() {
+    @Before("@gym-core-service")
+    public void startStack() {
         GymCoreComponentStack.start();
     }
 

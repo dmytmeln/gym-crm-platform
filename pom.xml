@@ -45,6 +45,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <gymCore.image>gym-core-service:local</gymCore.image>
+        <workload.image>workload-service:local</workload.image>
     </properties>
 
     <dependencyManagement>

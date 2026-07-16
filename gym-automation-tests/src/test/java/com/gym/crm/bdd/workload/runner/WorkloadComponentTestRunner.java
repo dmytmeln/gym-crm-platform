@@ -1,4 +1,4 @@
-package com.gym.crm.bdd.runner;
+package com.gym.crm.bdd.workload.runner;
 
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
@@ -10,8 +10,8 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("features/gym-core-service")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.gym.crm.bdd")
+@SelectClasspathResource("features/workload-service")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.gym.crm.bdd.workload,com.gym.crm.bdd.support")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty,summary")
-public class GymCoreComponentTestRunner {
+public class WorkloadComponentTestRunner {
 }

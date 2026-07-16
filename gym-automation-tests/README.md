@@ -59,6 +59,16 @@ mvn verify -pl gym-automation-tests "-DskipITs=false" `
   "-DgymCore.image=gym-core-service:abc123"
 ```
 
+## Build the Workload image
+
+```powershell
+mvn package -pl workload-service -am
+mvn spring-boot:build-image-no-fork -pl workload-service
+```
+
+The default image is `workload-service:local`. Override it with `-Dworkload.image=workload-service:abc123` for both
+image creation and test execution.
+
 ## Run BDD tests
 
 Run every BDD scenario:
@@ -75,8 +85,7 @@ mvn test
 mvn verify
 ```
 
-Surefire excludes `*Runner` classes by default. Failsafe is configured to execute `GymCoreComponentTestRunner` (matching `*TestRunner`) during
-`integration-test` and check its results during `verify`.
+Surefire excludes `*Runner` classes by default. Failsafe executes `*TestRunner` suites during `integration-test` and checks results during `verify`.
 
 ## Focused execution
 
@@ -87,6 +96,8 @@ mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@h
 mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@authn"
 mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@authz"
 mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@validation"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@gym-core-service"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@workload-service"
 ```
 
 Without `cucumber.filter.tags`, all scenarios selected by the runner execute.
@@ -102,3 +113,12 @@ The Gym Core suite starts one isolated Testcontainers stack for the test run:
 
 Scenarios run sequentially. Test data is provisioned through public registration and authentication APIs. Tests access
 Gym Core only through HTTP and JMS contracts.
+
+The Workload suite starts a separate isolated stack:
+
+- Workload Service from `workload.image`
+- MongoDB
+- ActiveMQ Classic
+
+Its focused component scenario publishes a raw workload JMS contract and verifies the persisted monthly total through
+the authenticated HTTP API.

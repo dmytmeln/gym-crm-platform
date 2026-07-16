@@ -1,8 +1,8 @@
-package com.gym.crm.bdd.client;
+package com.gym.crm.bdd.gymcore.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gym.crm.bdd.support.GymCoreComponentStack;
+import com.gym.crm.bdd.gymcore.support.GymCoreComponentStack;
 import jakarta.jms.Connection;
 import jakarta.jms.Message;
 import jakarta.jms.MessageConsumer;
@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.gym.crm.bdd.support.GymCoreComponentStack.QUEUE;
+import static com.gym.crm.bdd.gymcore.support.GymCoreComponentStack.QUEUE;
 import static jakarta.jms.Session.AUTO_ACKNOWLEDGE;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-public class WorkloadQueueClient {
+public class TrainerWorkloadQueueConsumer {
 
     private static final int RECEIVE_POLL_MILLIS = 500;
     private static final int MINIMUM_RECEIVE_TIMEOUT_MILLIS = 1;
