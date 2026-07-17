@@ -4,6 +4,7 @@ import com.gym.crm.bdd.gymcore.support.GymCoreComponentStack;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 
+@SuppressWarnings("unused")
 public class GymCoreComponentHooks {
 
     @Before("@gym-core-service")

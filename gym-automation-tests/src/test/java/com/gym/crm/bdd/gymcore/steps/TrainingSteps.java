@@ -218,6 +218,13 @@ public class TrainingSteps {
         assertThat(response.jsonPath().getString("errorMessage")).isNotBlank();
     }
 
+    @Then("request is rejected with:")
+    public void requestIsRejectedWith(ExpectedError expected) {
+        assertThat(response.statusCode()).isEqualTo(expected.status());
+        assertThat(response.jsonPath().getInt("errorCode")).isEqualTo(expected.errorCode());
+        assertThat(response.jsonPath().getString("errorMessage")).isNotBlank();
+    }
+
     @Then("response challenges Bearer authentication")
     public void responseChallengesBearerAuthentication() {
         assertThat(response.header(WWW_AUTHENTICATE_HEADER)).isEqualTo(BEARER_CHALLENGE);
@@ -236,6 +243,9 @@ public class TrainingSteps {
     }
 
     private record RegisteredTrainee(String username, String password) {
+    }
+
+    public record ExpectedError(int status, int errorCode) {
     }
 
 }

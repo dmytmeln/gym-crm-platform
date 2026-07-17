@@ -42,22 +42,16 @@ Feature: Create Training
       And response challenges Bearer authentication
 
     @negative @authz
-    Scenario: Deactivated trainer
-      And trainer account is deactivated
+    Scenario Outline: Authorization failures
+      And <condition>
       When trainer creates Training
-      Then request is rejected with status 403 and error code 2807
+      Then request is rejected with status <status> and error code <errorCode>
 
-    @negative @authz
-    Scenario: Trainee role
-      And caller is trainee
-      When trainer creates Training
-      Then request is rejected with status 403 and error code 2806
-
-    @negative @authz
-    Scenario: Trainer acts for another trainer
-      And request names another trainer
-      When trainer creates Training
-      Then request is rejected with status 403 and error code 2806
+      Examples:
+        | condition                      | status | errorCode |
+        | trainer account is deactivated | 403    | 2807      |
+        | caller is trainee              | 403    | 2806      |
+        | request names another trainer  | 403    | 2806      |
 
   Rule: Invalid Training requests are rejected
 
@@ -119,7 +113,9 @@ Feature: Create Training
     @negative @validation
     Scenario: Unsupported content type
       When caller sends unsupported content type
-      Then request is rejected with status 415 and error code 3200
+      Then request is rejected with:
+        | status | errorCode |
+        | 415    | 3200      |
 
   Rule: Referenced participants must exist
 
@@ -127,4 +123,6 @@ Feature: Create Training
     Scenario: Unknown trainee
       And request names unknown trainee
       When trainer creates Training
-      Then request is rejected with status 404 and error code 2835
+      Then request is rejected with:
+        | status | errorCode |
+        | 404    | 2835      |

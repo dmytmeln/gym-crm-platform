@@ -32,6 +32,7 @@ public final class WorkloadComponentStack {
     private static final String ACTIVEMQ_ALIAS = "activemq";
     private static final String ACTIVEMQ_USER = "admin";
     private static final String ACTIVEMQ_PASSWORD = "admin";
+
     private static Network network;
     private static MongoDBContainer mongodb;
     private static GenericContainer<?> activeMQ;
@@ -43,16 +44,7 @@ public final class WorkloadComponentStack {
         }
 
         initializeContainers();
-
-        try {
-            Startables.deepStart(Stream.of(mongodb, activeMQ)).join();
-
-            workload = createWorkloadService();
-            workload.start();
-        } catch (RuntimeException exception) {
-            stop();
-            throw exception;
-        }
+        startContainers();
     }
 
     public static String baseUrl() {
@@ -82,6 +74,18 @@ public final class WorkloadComponentStack {
         network = Network.newNetwork();
         mongodb = createMongoDBContainer();
         activeMQ = createActiveMQContainer();
+    }
+
+    private static void startContainers() {
+        try {
+            Startables.deepStart(Stream.of(mongodb, activeMQ)).join();
+
+            workload = createWorkloadService();
+            workload.start();
+        } catch (RuntimeException exception) {
+            stop();
+            throw exception;
+        }
     }
 
     @SuppressWarnings("resource")
