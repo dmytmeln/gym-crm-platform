@@ -1,4 +1,4 @@
-# BDD Component Tests
+# BDD Component and Integration Tests
 
 Black-box Cucumber tests for deployed service images. The module has no dependency on production Java modules or
 production contract classes.
@@ -69,6 +69,21 @@ mvn spring-boot:build-image-no-fork -pl workload-service
 The default image is `workload-service:local`. Override it with `-Dworkload.image=workload-service:abc123` for both
 image creation and test execution.
 
+## Build images for Core–Workload integration
+
+Package both services and their reactor dependencies, then build the default local images:
+
+```powershell
+mvn package -pl gym-core-service,workload-service -am
+mvn spring-boot:build-image-no-fork -pl gym-core-service,workload-service
+```
+
+Run the Core–Workload topology:
+
+```powershell
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@core-workload"
+```
+
 ## Run BDD tests
 
 Run every BDD scenario:
@@ -98,6 +113,9 @@ mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@a
 mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@validation"
 mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@gym-core-service"
 mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@workload-service"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@core-workload"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@cascade-delete"
+mvn verify -pl gym-automation-tests "-DskipITs=false" "-Dcucumber.filter.tags=@trainer-workload and @negative"
 ```
 
 Without `cucumber.filter.tags`, all scenarios selected by the runner execute.
@@ -122,3 +140,19 @@ The Workload suite starts a separate isolated stack:
 
 Its focused component scenario publishes a raw workload JMS contract and verifies the persisted monthly total through
 the authenticated HTTP API.
+
+The Core–Workload integration suite starts one topology containing:
+
+- Gym Core from `gymCore.image`
+- Workload Service from `workload.image`
+- MySQL
+- MongoDB
+- Redis
+- ActiveMQ Classic
+
+Gateway and Discovery Server are excluded. Infrastructure starts in parallel, followed by both services in parallel.
+Scenarios use only Gym Core and Workload public HTTP APIs, run sequentially with unique data, and share the topology for
+the suite. Failed scenarios print both service container logs before teardown.
+
+Integration feature tags are `@integration`, `@core-workload`, and `@trainer-workload`. Behavioral tags are
+`@happy-path`, `@cascade-delete`, and `@negative`.

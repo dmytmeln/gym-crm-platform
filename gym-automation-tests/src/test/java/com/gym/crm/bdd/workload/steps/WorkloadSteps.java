@@ -5,6 +5,7 @@ import com.gym.crm.bdd.workload.client.WorkloadRestClient;
 import com.gym.crm.bdd.workload.model.WorkloadAction;
 import com.gym.crm.bdd.workload.model.WorkloadUpdatePayload;
 import com.gym.crm.bdd.workload.support.JwtTokenFactory;
+import com.gym.crm.bdd.workload.support.WorkloadComponentStack;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -29,7 +30,7 @@ public class WorkloadSteps {
     private static final Duration NEGATIVE_OBSERVATION = Duration.ofSeconds(2);
 
     private final TrainerWorkloadQueuePublisher workloadQueuePublisher = new TrainerWorkloadQueuePublisher();
-    private final WorkloadRestClient workloadRestClient = new WorkloadRestClient();
+    private final WorkloadRestClient workloadRestClient = new WorkloadRestClient(WorkloadComponentStack.baseUrl());
 
     private String username;
     private String accessToken;

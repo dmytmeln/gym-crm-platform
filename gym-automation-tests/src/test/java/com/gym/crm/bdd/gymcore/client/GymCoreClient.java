@@ -2,17 +2,15 @@ package com.gym.crm.bdd.gymcore.client;
 
 import com.gym.crm.bdd.gymcore.model.CreateTraineeRequest;
 import com.gym.crm.bdd.gymcore.model.CreateTrainerRequest;
-import com.gym.crm.bdd.gymcore.support.GymCoreComponentStack;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static java.util.Objects.requireNonNull;
 
-@NoArgsConstructor
 public class GymCoreClient {
 
     private static final int HTTP_OK = 200;
@@ -22,6 +20,12 @@ public class GymCoreClient {
     private static final String TRAINEES_BASE = "/trainees";
     private static final String AUTH_BASE = "/auth";
     private static final String TRAININGS_BASE = "/trainings";
+
+    private final String baseUrl;
+
+    public GymCoreClient(String baseUrl) {
+        this.baseUrl = requireNonNull(baseUrl);
+    }
 
     public Response registerTrainer(CreateTrainerRequest request) {
         return request()
@@ -62,6 +66,11 @@ public class GymCoreClient {
                 .get(TRAINERS_BASE + "/{username}/trainings", username);
     }
 
+    public Response deleteTrainee(String username, String token) {
+        return request(token)
+                .delete(TRAINEES_BASE + "/{username}", username);
+    }
+
     public void logout(String token) {
         request(token)
                 .post(AUTH_BASE + "/logout")
@@ -79,7 +88,7 @@ public class GymCoreClient {
     }
 
     private RequestSpecification request() {
-        return given().baseUri(GymCoreComponentStack.baseUrl());
+        return given().baseUri(baseUrl);
     }
 
     private RequestSpecification request(String token) {
