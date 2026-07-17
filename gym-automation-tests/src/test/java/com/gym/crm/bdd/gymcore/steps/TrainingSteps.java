@@ -33,7 +33,7 @@ public class TrainingSteps {
     private static final String BEARER_CHALLENGE = "Bearer";
     private static final String QUEUE_PREFIX = "queue://";
 
-    private final GymCoreClient gymCoreClient = new GymCoreClient();
+    private final GymCoreClient gymCoreClient = new GymCoreClient(GymCoreComponentStack.baseUrl());
     private final TrainerWorkloadQueueConsumer workloadQueueConsumer = new TrainerWorkloadQueueConsumer();
 
     private RegisteredTrainer trainer;
@@ -82,6 +82,7 @@ public class TrainingSteps {
     }
 
     @Given("caller is trainee")
+    @SuppressWarnings("unused")
     public void callerIsTrainee() {
         accessToken = gymCoreClient.login(trainee.username(), trainee.password());
     }
@@ -92,11 +93,13 @@ public class TrainingSteps {
     }
 
     @Given("trainer account is deactivated")
+    @SuppressWarnings("unused")
     public void trainerAccountIsDeactivated() {
         gymCoreClient.deactivateTrainer(trainer.username(), accessToken);
     }
 
     @Given("request names another trainer")
+    @SuppressWarnings("unused")
     public void requestNamesAnotherTrainer() {
         String suffix = uniqueSuffix();
         CreateTrainerRequest request = new CreateTrainerRequest("Other" + suffix, "Trainer", "CARDIO");
