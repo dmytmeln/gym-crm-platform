@@ -1,4 +1,4 @@
-package com.gym.crm.bdd.support;
+package com.gym.crm.bdd.gymcore.support;
 
 import com.redis.testcontainers.RedisContainer;
 import lombok.NoArgsConstructor;
@@ -35,6 +35,7 @@ public final class GymCoreComponentStack {
     private static final String ACTIVEMQ_ALIAS = "activemq";
     private static final String ACTIVEMQ_USER = "admin";
     private static final String ACTIVEMQ_PASSWORD = "admin";
+
     private static Network network;
     private static MySQLContainer<?> mysql;
     private static RedisContainer redis;
@@ -42,17 +43,12 @@ public final class GymCoreComponentStack {
     private static GenericContainer<?> gymCore;
 
     public static void start() {
-        initializeContainers();
-
-        try {
-            Startables.deepStart(Stream.of(mysql, redis, activeMQ)).join();
-
-            gymCore = createGymCoreService();
-            gymCore.start();
-        } catch (RuntimeException exception) {
-            stop();
-            throw exception;
+        if (gymCore != null) {
+            return;
         }
+
+        initializeContainers();
+        startContainers();
     }
 
     public static String baseUrl() {
@@ -85,6 +81,18 @@ public final class GymCoreComponentStack {
         mysql = createMySQLContainer();
         redis = createRedisContainer();
         activeMQ = createActiveMQContainer();
+    }
+
+    private static void startContainers() {
+        try {
+            Startables.deepStart(Stream.of(mysql, redis, activeMQ)).join();
+
+            gymCore = createGymCoreService();
+            gymCore.start();
+        } catch (RuntimeException exception) {
+            stop();
+            throw exception;
+        }
     }
 
     @SuppressWarnings("resource")

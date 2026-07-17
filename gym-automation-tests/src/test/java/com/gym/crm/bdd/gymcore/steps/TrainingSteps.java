@@ -1,11 +1,12 @@
-package com.gym.crm.bdd.steps;
+package com.gym.crm.bdd.gymcore.steps;
 
-import com.gym.crm.bdd.client.GymCoreClient;
-import com.gym.crm.bdd.client.WorkloadQueueClient;
-import com.gym.crm.bdd.model.CreateTraineeRequest;
-import com.gym.crm.bdd.model.CreateTrainerRequest;
-import com.gym.crm.bdd.model.TrainingRequest;
-import com.gym.crm.bdd.support.GymCoreComponentStack;
+import com.gym.crm.bdd.gymcore.client.GymCoreClient;
+import com.gym.crm.bdd.gymcore.client.TrainerWorkloadQueueConsumer;
+import com.gym.crm.bdd.gymcore.client.TrainerWorkloadQueueConsumer.ReceivedWorkload;
+import com.gym.crm.bdd.gymcore.model.CreateTraineeRequest;
+import com.gym.crm.bdd.gymcore.model.CreateTrainerRequest;
+import com.gym.crm.bdd.gymcore.model.TrainingRequest;
+import com.gym.crm.bdd.gymcore.support.GymCoreComponentStack;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -33,7 +34,7 @@ public class TrainingSteps {
     private static final String QUEUE_PREFIX = "queue://";
 
     private final GymCoreClient gymCoreClient = new GymCoreClient();
-    private final WorkloadQueueClient workloadQueueClient = new WorkloadQueueClient();
+    private final TrainerWorkloadQueueConsumer workloadQueueConsumer = new TrainerWorkloadQueueConsumer();
 
     private RegisteredTrainer trainer;
     private RegisteredTrainee trainee;
@@ -43,8 +44,8 @@ public class TrainingSteps {
 
     @Given("trainer is created with:")
     public void trainerIsCreatedWith(CreateTrainerRequest request) {
-        Response response = gymCoreClient.registerTrainer(request);
-        Map<String, String> trainerRegistration = response.then()
+        Response registrationResponse = gymCoreClient.registerTrainer(request);
+        Map<String, String> trainerRegistration = registrationResponse.then()
                 .statusCode(HTTP_OK)
                 .extract()
                 .body()
@@ -57,8 +58,8 @@ public class TrainingSteps {
 
     @Given("trainee is created with:")
     public void traineeIsCreatedWith(CreateTraineeRequest request) {
-        Response response = gymCoreClient.registerTrainee(request);
-        Map<String, String> traineeRegistration = response.then()
+        Response registrationResponse = gymCoreClient.registerTrainee(request);
+        Map<String, String> traineeRegistration = registrationResponse.then()
                 .statusCode(HTTP_OK)
                 .extract()
                 .body()
@@ -196,10 +197,10 @@ public class TrainingSteps {
 
     @Then("exactly one matching ADD workload update is published")
     public void workloadUpdateIsPublished() throws Exception {
-        List<WorkloadQueueClient.ReceivedWorkload> messages = workloadQueueClient.awaitForUsername(trainer.username(),
+        List<ReceivedWorkload> messages = workloadQueueConsumer.awaitForUsername(trainer.username(),
                 Duration.ofSeconds(WORKLOAD_WAIT_SECONDS));
         assertThat(messages).as("workload messages for trainer during observation window").hasSize(1);
-        WorkloadQueueClient.ReceivedWorkload message = messages.getFirst();
+        ReceivedWorkload message = messages.getFirst();
         assertThat(message.body().path("actionType").asText()).isEqualTo("ADD");
         assertThat(message.body().path("username").asText()).isEqualTo(trainer.username());
         assertThat(message.body().path("firstName").asText()).isEqualTo(trainer.firstName());
@@ -214,6 +215,13 @@ public class TrainingSteps {
     public void requestIsRejected(int status, int errorCode) {
         assertThat(response.statusCode()).isEqualTo(status);
         assertThat(response.jsonPath().getInt("errorCode")).isEqualTo(errorCode);
+        assertThat(response.jsonPath().getString("errorMessage")).isNotBlank();
+    }
+
+    @Then("request is rejected with:")
+    public void requestIsRejectedWith(ExpectedError expected) {
+        assertThat(response.statusCode()).isEqualTo(expected.status());
+        assertThat(response.jsonPath().getInt("errorCode")).isEqualTo(expected.errorCode());
         assertThat(response.jsonPath().getString("errorMessage")).isNotBlank();
     }
 
@@ -235,6 +243,9 @@ public class TrainingSteps {
     }
 
     private record RegisteredTrainee(String username, String password) {
+    }
+
+    public record ExpectedError(int status, int errorCode) {
     }
 
 }

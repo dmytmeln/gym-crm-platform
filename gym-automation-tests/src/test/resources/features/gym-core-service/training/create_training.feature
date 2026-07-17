@@ -1,4 +1,4 @@
-@component @gym-core @create-training
+@component @gym-core-service @create-training
 Feature: Create Training
 
   Background:
@@ -22,46 +22,40 @@ Feature: Create Training
 
   Rule: Creation requires authorized active trainer
 
-    @authn
+    @negative @authn
     Scenario: Anonymous creation
       When caller creates Training without token
       Then request is rejected with status 401 and error code 2805
       And response challenges Bearer authentication
 
-    @authn
+    @negative @authn
     Scenario: Invalid token
       When caller creates Training with invalid token
       Then request is rejected with status 401 and error code 2805
       And response challenges Bearer authentication
 
-    @authn
+    @negative @authn
     Scenario: Logged-out token
       And trainer token was logged out
       When trainer creates Training
       Then request is rejected with status 401 and error code 2805
       And response challenges Bearer authentication
 
-    @authz
-    Scenario: Deactivated trainer
-      And trainer account is deactivated
+    @negative @authz
+    Scenario Outline: Authorization failures
+      And <condition>
       When trainer creates Training
-      Then request is rejected with status 403 and error code 2807
+      Then request is rejected with status <status> and error code <errorCode>
 
-    @authz
-    Scenario: Trainee role
-      And caller is trainee
-      When trainer creates Training
-      Then request is rejected with status 403 and error code 2806
-
-    @authz
-    Scenario: Trainer acts for another trainer
-      And request names another trainer
-      When trainer creates Training
-      Then request is rejected with status 403 and error code 2806
+      Examples:
+        | condition                      | status | errorCode |
+        | trainer account is deactivated | 403    | 2807      |
+        | caller is trainee              | 403    | 2806      |
+        | request names another trainer  | 403    | 2806      |
 
   Rule: Invalid Training requests are rejected
 
-    @validation
+    @negative @validation
     Scenario Outline: Required field is omitted
       And required field "<field>" is omitted
       When trainer creates Training
@@ -75,56 +69,60 @@ Feature: Create Training
         | trainingDate     |
         | trainingDuration |
 
-    @validation
+    @negative @validation
     Scenario: Blank Training name
       And training name is blank
       When trainer creates Training
       Then request is rejected with status 400 and error code 2760
 
-    @validation
+    @negative @validation
     Scenario: Whitespace-only Training name
       And training name is whitespace only
       When trainer creates Training
       Then request is rejected with status 400 and error code 2760
 
-    @validation
+    @negative @validation
     Scenario: Oversized Training name
       And training name contains 101 characters
       When trainer creates Training
       Then request is rejected with status 400 and error code 2760
 
-    @validation
+    @negative @validation
     Scenario: Zero duration
       And training duration is zero
       When trainer creates Training
       Then request is rejected with status 400 and error code 2760
 
-    @validation
+    @negative @validation
     Scenario: Oversized username
       And trainee username contains 221 characters
       When trainer creates Training
       Then request is rejected with status 400 and error code 2760
 
-    @validation
+    @negative @validation
     Scenario: Invalid date
       And training date is invalid
       When trainer creates Training
       Then request is rejected with status 400 and error code 2760
 
-    @validation
+    @negative @validation
     Scenario: Malformed JSON
       When caller sends malformed JSON
       Then request is rejected with status 400 and error code 2760
 
-    @validation
+    @negative @validation
     Scenario: Unsupported content type
       When caller sends unsupported content type
-      Then request is rejected with status 415 and error code 3200
+      Then request is rejected with:
+        | status | errorCode |
+        | 415    | 3200      |
 
   Rule: Referenced participants must exist
 
-    @validation
+    @negative @validation
     Scenario: Unknown trainee
       And request names unknown trainee
       When trainer creates Training
-      Then request is rejected with status 404 and error code 2835
+      Then request is rejected with:
+        | status | errorCode |
+        | 404    | 2835      |
