@@ -1,0 +1,234 @@
+name: gym-crm-platform
+
+services:
+  mysql:
+    image: mysql:8.4.11
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-gym}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-gym_db}
+      MYSQL_USER: ${MYSQL_USER:-gym}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-gym}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - mysql-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  redis:
+    image: redis:7.4.10
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    command: ["redis-server", "--appendonly", "no", "--save", ""]
+    networks:
+      - redis-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+
+  mongo:
+    image: mongo:7.0.39
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-gym}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-gym}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh \"mongodb://$$MONGO_INITDB_ROOT_USERNAME:$$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:27017/admin\" --eval \"db.adminCommand('ping')\" --quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  activemq:
+    image: apache/activemq:6.3.0
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      ACTIVEMQ_WEB_USER: ${ACTIVEMQ_WEB_USER:-gym}
+      ACTIVEMQ_WEB_PASSWORD: ${ACTIVEMQ_WEB_PASSWORD:-gym}
+    ports:
+      - "8161:8161"
+    volumes:
+      - activemq-data:/opt/apache-activemq/data
+    networks:
+      - messaging-net
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/61616' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  discovery-server:
+    build:
+      context: .
+      dockerfile: discovery-server/Dockerfile
+    image: discovery-server:1.0-SNAPSHOT
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      DISCOVERY_SERVER_URL: ${DISCOVERY_SERVER_URL:-http://discovery-server:8761/eureka/}
+    ports:
+      - "8761:8761"
+    networks:
+      - gateway-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    image: api-gateway:1.0-SNAPSHOT
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      DISCOVERY_SERVER_URL: ${DISCOVERY_SERVER_URL:-http://discovery-server:8761/eureka/}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+      EUREKA_INSTANCE_HOSTNAME: api-gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - gateway-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  gym-core-service:
+    build:
+      context: .
+      dockerfile: gym-core-service/Dockerfile
+    image: gym-core-service:1.0-SNAPSHOT
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      DB_URL: ${DB_URL:-jdbc:mysql://mysql:3306/gym_db}
+      DB_USERNAME: ${DB_USERNAME:-gym}
+      DB_PASSWORD: ${DB_PASSWORD:-gym}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      ACTIVEMQ_BROKER_URL: ${ACTIVEMQ_BROKER_URL:-tcp://activemq:61616}
+      ACTIVEMQ_USER: ${ACTIVEMQ_USER:-gym}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD:-gym}
+      DISCOVERY_SERVER_URL: ${DISCOVERY_SERVER_URL:-http://discovery-server:8761/eureka/}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+      EUREKA_INSTANCE_HOSTNAME: gym-core-service
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://editor.swagger.io/}
+    networks:
+      - gateway-net
+      - mysql-net
+      - redis-net
+      - messaging-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      activemq:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8082/gym-crm/core/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  workload-service:
+    build:
+      context: .
+      dockerfile: workload-service/Dockerfile
+    image: workload-service:1.0-SNAPSHOT
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      ACTIVEMQ_BROKER_URL: ${ACTIVEMQ_BROKER_URL:-tcp://activemq:61616}
+      ACTIVEMQ_USER: ${ACTIVEMQ_USER:-gym}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD:-gym}
+      MONGO_URI: ${MONGO_URI:-mongodb://gym:gym@mongo:27017/gym_workload?authSource=admin}
+      DISCOVERY_SERVER_URL: ${DISCOVERY_SERVER_URL:-http://discovery-server:8761/eureka/}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+      EUREKA_INSTANCE_HOSTNAME: workload-service
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    networks:
+      - gateway-net
+      - mongo-net
+      - messaging-net
+    depends_on:
+      activemq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/gym-crm/workload/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+networks:
+  gateway-net:
+    driver: bridge
+  messaging-net:
+    driver: bridge
+  mysql-net:
+    driver: bridge
+    internal: true
+  redis-net:
+    driver: bridge
+    internal: true
+  mongo-net:
+    driver: bridge
+    internal: true
+
+volumes:
+  mysql-data:
+  mongo-data:
+  activemq-data:

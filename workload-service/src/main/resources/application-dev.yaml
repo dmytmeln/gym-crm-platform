@@ -29,3 +29,9 @@ app:
       maximum-delay-ms: 10000
       back-off-multiplier: 2.0
       use-exponential-back-off: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.gym.crm: DEBUG
